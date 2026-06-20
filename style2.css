@@ -1,0 +1,496 @@
+:root {
+    --bg: #0D1117;
+    --panel: #2A2E3A;
+    --panel-light: #383D4D;
+    --text: #E8E6F0;
+    --muted: #8B8FA3;
+    --track: #454B5C;
+    --focus: #FF9F1C;
+    --short: #7C5CFF;
+    --long: #3DDC97;
+    --danger: #FF5470;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+#desktop {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 44px);
+    overflow: hidden;
+    background-image: url(./city.jpg);
+    background-size: cover;
+    background-position: center;
+    /*background:
+        repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0px, rgba(255, 255, 255, 0.025) 1px, transparent 1px, transparent 3px),
+        radial-gradient(circle at 20% 10%, rgba(124, 92, 255, 0.08), transparent 40%),
+        radial-gradient(circle at 80% 85%, rgba(255, 159, 28, 0.06), transparent 40%),
+        var(--bg);*/
+}
+
+/* ---------- Desktop icons ---------- */
+.icons {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.icon {
+    width: 88px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.icon .glyph {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    background: var(--panel);
+    border: 1px solid var(--track);
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.45);
+}
+
+.icon:hover .glyph {
+    border-color: var(--muted);
+}
+
+.icon:active .glyph {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.icon .label {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- Windows ---------- */
+.window {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 360px;
+    background: var(--panel);
+    border: 1px solid #11141b;
+    box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.45);
+}
+
+.titlebar {
+    height: 32px;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px;
+    cursor: move;
+    background: linear-gradient(to bottom, var(--panel-light), var(--panel));
+    border-bottom: 1px solid #11141b;
+}
+
+.titlebar .name {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text);
+}
+
+.winbtns {
+    display: flex;
+    gap: 6px;
+}
+
+.winbtn {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--muted);
+    background: transparent;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+}
+
+.winbtn:hover {
+    border-color: var(--text);
+    color: var(--text);
+}
+
+.content {
+    padding: 16px;
+}
+
+/* ---------- Pomodoro app ---------- */
+.mode-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.mode-tab {
+    flex: 1;
+    padding: 6px 0;
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    background: var(--bg);
+    border: 1px solid var(--track);
+    color: var(--muted);
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.mode-tab.active {
+    color: #0D1117;
+    border-color: transparent;
+}
+
+#ring.mode-focus .mode-tab.active {
+    background: var(--focus);
+}
+
+.mode-tabs .mode-tab[data-mode="focus"].active {
+    background: var(--focus);
+    color: #0D1117;
+}
+
+.mode-tabs .mode-tab[data-mode="short"].active {
+    background: var(--short);
+    color: #0D1117;
+}
+
+.mode-tabs .mode-tab[data-mode="long"].active {
+    background: var(--long);
+    color: #0D1117;
+}
+
+.ring {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 14px;
+}
+
+.tick {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4px;
+    height: 14px;
+    margin-left: -2px;
+    margin-top: -100px;
+    transform-origin: 50% 100px;
+    background: var(--track);
+    border-radius: 1px;
+}
+
+.ring.mode-focus .tick.lit {
+    background: var(--focus);
+    box-shadow: 0 0 6px var(--focus);
+}
+
+.ring.mode-short .tick.lit {
+    background: var(--short);
+    box-shadow: 0 0 6px var(--short);
+}
+
+.ring.mode-long .tick.lit {
+    background: var(--long);
+    box-shadow: 0 0 6px var(--long);
+}
+
+.ring-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.mode-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+}
+
+.ring.mode-focus .mode-label {
+    color: var(--focus);
+}
+
+.ring.mode-short .mode-label {
+    color: var(--short);
+}
+
+.ring.mode-long .mode-label {
+    color: var(--long);
+}
+
+.timer-display {
+    font-family: 'VT323', monospace;
+    font-size: 56px;
+    line-height: 1;
+    color: var(--text);
+}
+
+.pips {
+    display: flex;
+    gap: 5px;
+    margin-top: 4px;
+}
+
+.pip {
+    width: 6px;
+    height: 6px;
+    border: 1px solid var(--muted);
+    background: transparent;
+}
+
+.pip.filled {
+    background: var(--focus);
+    border-color: var(--focus);
+}
+
+.controls {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.btn {
+    flex: 1;
+    padding: 10px 0;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    font-family: inherit;
+    background: var(--bg);
+    border: 1px solid var(--track);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.btn:hover {
+    border-color: var(--muted);
+}
+
+.btn.primary {
+    background: var(--focus);
+    color: #0D1117;
+    border-color: var(--focus);
+    font-weight: 600;
+}
+
+.btn.danger:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+.settings {
+    border: 1px solid var(--track);
+    padding: 10px;
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.settings .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.settings input {
+    width: 46px;
+    background: var(--bg);
+    border: 1px solid var(--track);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 11px;
+    padding: 3px 4px;
+    text-align: center;
+}
+
+.settings textarea {
+    width: 46px;
+    background: var(--bg);
+    border: 1px solid var(--track);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 11px;
+    padding: 3px 4px;
+    text-align: center;
+    margin-left: 1rem;
+}
+
+#session-details {
+    width: 138px;
+    word-break: break-all;
+}
+
+.settings .apply {
+    width: 100%;
+    margin-top: 4px;
+    padding: 6px 0;
+}
+
+/* ---------- Log app ---------- */
+.log-header {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+
+#log-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.log-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    border-bottom: 1px solid var(--track);
+    padding-bottom: 5px;
+}
+
+.log-type.lt-focus {
+    color: var(--focus);
+}
+
+.log-type.lt-break {
+    color: var(--short);
+}
+
+.log-time {
+    color: var(--muted);
+}
+
+.log-empty {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+/* ---------- Taskbar ---------- */
+#taskbar {
+    height: 44px;
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px;
+    background: var(--panel);
+    border-top: 1px solid #11141b;
+}
+
+#start-btn {
+    height: 30px;
+    padding: 0 14px;
+    background: var(--panel-light);
+    border: 1px solid var(--track);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+}
+
+#start-btn:hover {
+    border-color: var(--muted);
+}
+
+#taskbar-items {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+}
+
+.taskpill {
+    height: 28px;
+    padding: 0 12px;
+    background: var(--bg);
+    border: 1px solid var(--track);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.taskpill:hover {
+    border-color: var(--muted);
+}
+
+#clock {
+    font-family: 'VT323', monospace;
+    font-size: 20px;
+    color: var(--text);
+    min-width: 90px;
+    text-align: right;
+}
+
+#start-menu {
+    position: absolute;
+    bottom: 50px;
+    left: 8px;
+    width: 170px;
+    background: var(--panel);
+    border: 1px solid var(--track);
+    box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.45);
+    display: none;
+    flex-direction: column;
+}
+
+#start-menu.open {
+    display: flex;
+}
+
+.menu-item {
+    padding: 10px 12px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    color: var(--text);
+    border-bottom: 1px solid var(--track);
+}
+
+.menu-item:last-child {
+    border-bottom: none;
+}
+
+.menu-item:hover {
+    background: var(--panel-light);
+}
+
+#start-btn-main {
+    background-color: darkgrey;
+}

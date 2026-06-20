@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FocusOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="style2.css">
+</head>
+<body>
+
+  <div id="desktop">
+    <div class="icons">
+      <div class="icon" ondblclick="openWindow('pomodoro')">
+        <div class="glyph">⏱</div>
+        <div class="label">POMODORO</div>
+      </div>
+      <div class="icon" ondblclick="openWindow('log')">
+        <div class="glyph">🗒</div>
+        <div class="label">SESSION LOG</div>
+      </div>
+    </div>
+
+    <!-- Pomodoro window -->
+    <div class="window" id="win-pomodoro" style="left:calc(50% - 180px); top:36px;">
+      <div class="titlebar" data-handle>
+        <span class="name">POMODORO.EXE</span>
+        <div class="winbtns">
+          <button class="winbtn" onclick="minimizeWindow('pomodoro')">—</button>
+          <button class="winbtn" onclick="closeWindow('pomodoro')">×</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="mode-tabs">
+          <button class="mode-tab" data-mode="focus" onclick="switchMode('focus')">STUDY</button>
+          <button class="mode-tab" data-mode="short" onclick="switchMode('short')">SHORT</button>
+          <button class="mode-tab" data-mode="long" onclick="switchMode('long')">LONG</button>
+        </div>
+
+        <div class="ring" id="ring">
+          <div class="ring-center">
+            <div class="mode-label" id="mode-label">STUDY</div>
+            <div class="timer-display" id="timer-display">25:00</div>
+            <div class="pips" id="pips"></div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="btn primary" id="start-btn" onclick="toggleTimer()">START</button>
+          <button class="btn danger" onclick="resetTimer()">RESET</button>
+        </div>
+
+        <div class="settings">
+          <div class="row"><span>Study (min)</span><input id="set-focus" type="number" value="25" min="1"></div>
+          <div class="row"><span>Short break (min)</span><input id="set-short" type="number" value="5" min="1"></div>
+          <div class="row"><span>Long break (min)</span><input id="set-long" type="number" value="15" min="1"></div>
+          <div class="row"><span>Session details</span><textarea id="session-details" type="text" placeholder="Enter text here" min="1"></textarea></div>
+          <button class="btn apply" onclick="applySettings()">APPLY</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Session Log window -->
+    <div class="window" id="win-log" style="left:calc(50% - 180px + 60px); top:120px; display:none;">
+      <div class="titlebar" data-handle>
+        <span class="name">SESSION_LOG.TXT</span>
+        <div class="winbtns">
+          <button class="winbtn" onclick="minimizeWindow('log')">—</button>
+          <button class="winbtn" onclick="closeWindow('log')">×</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="log-header">TODAY'S SESSIONS</div>
+        <div id="log-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="taskbar">
+    <button id="start-btn-main" onclick="toggleStartMenu()">≡ FOCUS OS</button>
+    <div id="start-menu">
+      <div class="menu-item" onclick="openWindow('pomodoro'); toggleStartMenu()">⏱ Pomodoro</div>
+      <div class="menu-item" onclick="openWindow('log'); toggleStartMenu()">🗒 Session Log</div>
+    </div>
+    <div id="taskbar-items"></div>
+    <div id="clock">00:00:00</div>
+  </div>
+
+  <script src="script2.js"></script>
+</body>
+</html>
