@@ -1,7 +1,8 @@
 //Window manager
 const windows = {
     pomodoro: { elem: document.getElementById(`win-pomodoro`), title: `⏱ Pomodoro` },
-    log: { elem: document.getElementById(`win-log`),      title: `🗒 Session Log` }
+    log: { elem: document.getElementById(`win-log`),      title: `🗒 Session Log` },
+    help: {elem: document.getElementById(`win-help`), title: `? Help`},
 };
 let zCounter = 10;
 
@@ -121,10 +122,19 @@ function renderTimer(){
   document.getElementById(`timer-display`).textContent = fmt(remaining);
   if (mode == `focus`){
     document.getElementById(`mode-label`).textContent = `STUDY`;
-  } else if (mode == `short`){
+    document.getElementById(`study`).style.display = "flex";
+    document.getElementById(`short`).style.display = "none";
+    document.getElementById(`long`).style.display = "none";
+} else if (mode == `short`){
     document.getElementById(`mode-label`).textContent = `SHORT BREAK`;
+    document.getElementById(`study`).style.display = "none";
+    document.getElementById(`short`).style.display = "flex";
+    document.getElementById(`long`).style.display = "none";
   } else {
     document.getElementById(`mode-label`).textContent = `LONG BREAK`;
+    document.getElementById(`study`).style.display = "none";
+    document.getElementById(`short`).style.display = "none";
+    document.getElementById(`long`).style.display = "flex";
   }
 
   const ring = document.getElementById(`ring`);
@@ -175,17 +185,16 @@ function beep(){
   }catch(e){}
 }
 
-//called by tick once remaining hits 0
 function completePhase(){
   pauseTimer();
   beep();
-  if (mode == `focus`){
+  if (mode == "focus"){
     completedFocusSessions++;
     sessionLog.unshift({ type: `Focus`, time: new Date() });
-    mode = (completedFocusSessions % 4 == 0) ? `long` : `short`;
+    mode = (completedFocusSessions % 4 == 0) ? "long" : "short";
   } else {
-    sessionLog.unshift({ type: mode == `long` ? `Long Break` : `Short Break`, time: new Date() });
-    mode = `focus`;
+    sessionLog.unshift({ type: mode == "long" ? "Long Break" : "Short Break", time: new Date() });
+    mode = "focus";
   }
   remaining = durations[mode];
   renderTimer();
@@ -214,16 +223,32 @@ function resetTimer(){
 }
 //called by mode tab buttons
 function switchMode(newMode){
-  mode = newMode;
+    if (newMode == "focus"){
+        document.getElementById(`study`).style.display = "flex";
+        document.getElementById(`short`).style.display = "none";
+        document.getElementById(`long`).style.display = "none";
+    } else if (newMode == "short"){
+        document.getElementById(`study`).style.display = "none";
+        document.getElementById(`short`).style.display = "flex";
+        document.getElementById(`long`).style.display = "none";
+    } else {
+        document.getElementById(`study`).style.display = "none";
+        document.getElementById(`short`).style.display = "none";
+        document.getElementById(`long`).style.display = "flex";
+    }
+    mode = newMode;
   pauseTimer();
   remaining = durations[mode];
   renderTimer();
 }
+
+let lastDetails = "";
 //called by settings save button
 function applySettings(){
   durations.focus = Math.max(1, parseInt(document.getElementById(`set-focus`).value || 25)) * 60;
   durations.short = Math.max(1, parseInt(document.getElementById(`set-short`).value || 5)) * 60;
   durations.long  = Math.max(1, parseInt(document.getElementById(`set-long`).value  || 15)) * 60;
+  let lastDetails = document.getElementById(`session-details`);
   if (!running){ remaining = durations[mode]; renderTimer(); }
 }
 
@@ -242,7 +267,7 @@ function renderLog(){
     row.className = `log-row`;
     const time = entry.time.toLocaleTimeString([], {hour:`2-digit`, minute:`2-digit`});
     const cls = entry.type.includes(`Focus`) ? `lt-focus` : `lt-break`;
-    row.innerHTML = `<span class="log-type ${cls}">${entry.type}</span><span class="log-time">${time}</span>`;
+    row.innerHTML = `<span class="log-type ${cls}">${entry.type}</span><span class="log-time">${time}</span><div style="display: flex; flex-direction: row; gap: 0.5rem;"><button style="background-color: green; width: 1rem; height: 1rem;"></button><button style="background-color: red; width: 1rem; height: 1rem;"></button></div>`;
     list.appendChild(row);
   }
 }

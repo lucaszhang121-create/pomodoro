@@ -19,6 +19,10 @@
         <div class="glyph">🗒</div>
         <div class="label">SESSION LOG</div>
       </div>
+      <div class="icon" ondblclick="openWindow('help')">
+        <div class="glyph">?</div>
+        <div class="label">HELP</div>
+      </div>
     </div>
 
     <!-- Pomodoro window -->
@@ -51,9 +55,9 @@
         </div>
 
         <div class="settings">
-          <div class="row"><span>Study (min)</span><input id="set-focus" type="number" value="25" min="1"></div>
-          <div class="row"><span>Short break (min)</span><input id="set-short" type="number" value="5" min="1"></div>
-          <div class="row"><span>Long break (min)</span><input id="set-long" type="number" value="15" min="1"></div>
+          <div class="row" id="study"><span>Study session duration (min)</span><input id="set-focus" type="number" value="25" min="1"></div>
+          <div class="row" id="short"><span>Short break duration (min)</span><input id="set-short" type="number" value="5" min="1"></div>
+          <div class="row" id="long"><span>Long break duration (min)</span><input id="set-long" type="number" value="15" min="1"></div>
           <div class="row"><span>Session details</span><textarea id="session-details" type="text" placeholder="Enter text here" min="1"></textarea></div>
           <button class="btn apply" onclick="applySettings()">APPLY</button>
         </div>
@@ -72,6 +76,38 @@
       <div class="content">
         <div class="log-header">TODAY'S SESSIONS</div>
         <div id="log-list"></div>
+      </div>
+    </div>
+
+    <div class="window" id="win-help" style="left:calc(50% - 180px + 60px); top:120px; display:none;">
+      <div class="titlebar" data-handle>
+        <span class="name">HELP_CENTER.TXT</span>
+        <div class="winbtns">
+          <button class="winbtn" onclick="minimizeWindow('help')">—</button>
+          <button class="winbtn" onclick="closeWindow('help')">×</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="log-header" style="font-size: 12.5px;">Frequently Asked Questions (FAQ)</div>
+        <div class="log-header">
+          <b>-What is Pomodoro?</b>
+          <br>
+          <p>The pomodoro technique is a popular time management method that enhances productivity and prevents burnout by separating work into timed intervals with short breaks in between.</p>
+          <p>It was invented in the late 1980s by a procrastination-prone Italian university student named Francesco Cirillo.</p>
+          <p>Fun fact: The technique's name can be attributed to Cirillo's tomato-shaped kitchen timer, with Pomodoro being the Italian word for tomato.</p>
+        </div>
+        <div class="log-header">
+          <b>-How can I use the Pomodoro technique?</b>
+          <br>
+          <p style="margin-bottom: 0rem;">The structure of the Pomodoro technique is as follows:</p>
+          <ol>
+            <li>Choose a simple task or part of a larger one to focus on.</li>
+            <li><b>Study Session</b> (25 minutes)</li>
+            <li><b>Short Break</b> (5 minutes)</li>
+            <li>Repeat previous two steps three more times</li>
+            <li>After completing four "Pomodoros" (Study Sessions), take a <b>Long Break</b> (15 minutes)</li>
+          </ol>
+        </div>
       </div>
     </div>
   </div>
