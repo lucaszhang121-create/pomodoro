@@ -4,7 +4,8 @@ const windows = {
     log: { elem: document.getElementById(`win-log`),      title: `🗒 Session Log` },
     help: {elem: document.getElementById(`win-help`), title: `? Help`},
     music: {elem: document.getElementById(`win-music`), title: `🎧 Music`},
-    nova: {elem: document.getElementById(`win-nova`), title: `Nova`}
+    nova: {elem: document.getElementById(`win-nova`), title: `💬 Nova`},
+    flashcards: {elem: document.getElementById(`win-flashcards`), title: `📇 Flashcards`}
 };
 let zCounter = 10;
 
