@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FocusOS</title>
+  <title>FocusOS — Master Environment</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="style2.css">
@@ -13,17 +13,134 @@
     html, body, #desktop {
       background: transparent !important;
       background-image: none !important;
+      font-family: 'IBM Plex Mono', monospace;
     }
 
     #space-bg {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
       z-index: -100;
       pointer-events: none; 
     }
+
+    /* ==========================================
+       SHARED APP PALETTE (NOVA & FLASHCARDS)
+    ========================================== */
+    #win-nova, #win-flashcards {
+      --bg: #0D1117;
+      --panel: #2A2E3A;
+      --panel-light: #383D4D;
+      --text: #E8E6F0;
+      --muted: #8B8FA3;
+      --track: #454B5C;
+      --focus: #FF9F1C;
+      --short: #7C5CFF;
+      --long: #3DDC97;
+      --danger: #FF5470;
+    }
+
+    /* ==========================================
+       NOVA.EXE SPECIFIC STYLES
+    ========================================== */
+    #win-nova {
+      width: 420px; height: 540px;
+      background: var(--panel);
+      border: 1px solid #11141b;
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.45);
+      display: flex; flex-direction: column;
+    }
+    #win-nova .titlebar {
+      background: linear-gradient(to bottom, var(--panel-light), var(--panel));
+      border-bottom: 1px solid #11141b;
+    }
+    #win-nova .content {
+      flex: 1; display: flex; flex-direction: column; overflow: hidden;
+    }
+    #win-nova .messages {
+      flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px;
+    }
+    #win-nova .messages::-webkit-scrollbar { width: 6px; }
+    #win-nova .messages::-webkit-scrollbar-track { background: var(--bg); }
+    #win-nova .messages::-webkit-scrollbar-thumb { background: var(--track); }
+    #win-nova .msg {
+      max-width: 85%; padding: 8px 10px; font-size: 11px; line-height: 1.6; border: 1px solid var(--track); word-wrap: break-word;
+    }
+    #win-nova .msg-user { align-self: flex-end; background: var(--bg); }
+    #win-nova .msg-nova { align-self: flex-start; background: var(--panel-light); }
+    #win-nova .msg-label { font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    #win-nova .msg-user .msg-label { color: var(--focus); }
+    #win-nova .msg-nova .msg-label { color: var(--short); }
+    #win-nova .msg-body { color: var(--text); white-space: pre-wrap; }
+    #win-nova .typing-indicator { align-self: flex-start; font-size: 10px; color: var(--muted); letter-spacing: 0.06em; padding: 6px 12px; display: none; }
+    #win-nova .typing-indicator.visible { display: block; }
+    #win-nova .empty-state { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: var(--muted); }
+    #win-nova .empty-state .glyph { font-size: 32px; opacity: 0.5; }
+    #win-nova .empty-state .hint { font-size: 10px; letter-spacing: 0.06em; }
+    #win-nova .input-bar { flex: none; display: flex; gap: 6px; padding: 10px 12px; border-top: 1px solid #11141b; background: var(--panel); }
+    #win-nova .input-bar input { flex: 1; background: var(--bg); border: 1px solid var(--track); color: var(--text); font-family: inherit; font-size: 11px; padding: 8px; outline: none; }
+    #win-nova .input-bar input:focus { border-color: var(--muted); }
+    #win-nova .input-bar input::placeholder { color: var(--muted); }
+    #win-nova .input-bar .btn { padding: 8px 14px; font-size: 10px; letter-spacing: 0.08em; font-family: inherit; background: var(--bg); border: 1px solid var(--track); color: var(--text); cursor: pointer; flex: none; }
+    #win-nova .input-bar .btn.primary { background: var(--focus); color: #0D1117; border-color: var(--focus); font-weight: 600; }
+    #win-nova .input-bar .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+    #win-nova .chat-error { font-size: 10px; color: var(--danger); padding: 0 12px 6px; min-height: 0; letter-spacing: 0.04em; }
+
+    /* ==========================================
+       FLASHCARDS.EXE SPECIFIC STYLES
+    ========================================== */
+    #win-flashcards {
+      width: 400px;
+      background: var(--panel);
+      border: 1px solid #11141b;
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.45);
+      display: flex; flex-direction: column;
+    }
+    #win-flashcards .titlebar {
+      background: linear-gradient(to bottom, var(--panel-light), var(--panel));
+      border-bottom: 1px solid #11141b;
+    }
+    #win-flashcards .content { padding: 16px; }
+    .fc-input-area { margin-bottom: 12px; }
+    .fc-input-area textarea {
+      width: 100%; height: 80px; background: var(--bg); border: 1px solid var(--track);
+      color: var(--text); font-family: inherit; font-size: 11px; padding: 8px; resize: vertical; outline: none;
+    }
+    .fc-input-area textarea:focus { border-color: var(--muted); }
+    .fc-input-area textarea::placeholder { color: var(--muted); }
+    #win-flashcards .btn { padding: 8px 0; font-size: 11px; letter-spacing: 0.08em; font-family: inherit; background: var(--bg); border: 1px solid var(--track); color: var(--text); cursor: pointer; width: 100%; }
+    #win-flashcards .btn:hover { border-color: var(--muted); }
+    #win-flashcards .btn.primary { background: var(--focus); color: #0D1117; border-color: var(--focus); font-weight: 600; }
+    #win-flashcards .btn.primary:hover { opacity: 0.9; }
+    #win-flashcards .btn.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .fc-error { font-size: 10px; color: var(--danger); margin-top: 6px; min-height: 16px; letter-spacing: 0.04em; }
+    .fc-loading { font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-align: center; padding: 8px 0; display: none; }
+    .fc-loading.visible { display: block; }
+    .fc-deck { display: none; flex-direction: column; align-items: center; margin-top: 14px; border-top: 1px solid var(--track); padding-top: 14px; }
+    .fc-deck.visible { display: flex; }
+    .fc-card-wrapper { perspective: 800px; width: 100%; height: 200px; cursor: pointer; }
+    .fc-card { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.5s ease; }
+    .fc-card.flipped { transform: rotateY(180deg); }
+    .fc-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; border: 1px solid var(--track); }
+    .fc-front { background: var(--bg); }
+    .fc-back { background: var(--panel-light); transform: rotateY(180deg); }
+    .fc-meta { position: absolute; top: 10px; left: 12px; right: 12px; display: flex; justify-content: space-between; align-items: center; }
+    .fc-subject { font-size: 9px; padding: 2px 8px; background: var(--panel); color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    .fc-diff { font-size: 9px; padding: 2px 8px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+    .fc-diff-easy   { background: rgba(61,220,151,0.15); color: var(--long); }
+    .fc-diff-medium { background: rgba(255,159,28,0.15); color: var(--focus); }
+    .fc-diff-hard   { background: rgba(255,84,112,0.15); color: var(--danger); }
+    .fc-text { font-size: 13px; line-height: 1.6; text-align: center; color: var(--text); padding: 0 4px; }
+    .fc-hint { position: absolute; bottom: 10px; font-size: 9px; color: var(--muted); letter-spacing: 0.08em; }
+    .fc-glow-easy   { box-shadow: 0 0 12px rgba(61,220,151,0.15); }
+    .fc-glow-medium { box-shadow: 0 0 12px rgba(255,159,28,0.15); }
+    .fc-glow-hard   { box-shadow: 0 0 12px rgba(255,84,112,0.15); }
+    .fc-nav { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-top: 10px; gap: 8px; }
+    .fc-nav .btn { width: auto !important; padding: 6px 14px !important; font-size: 10px !important; }
+    .fc-counter { font-family: 'VT323', monospace; font-size: 20px; color: var(--muted); letter-spacing: 2px; }
+    .fc-dots { display: flex; gap: 5px; margin-top: 10px; justify-content: center; flex-wrap: wrap; }
+    .fc-dot { width: 6px; height: 6px; border: 1px solid var(--muted); background: transparent; cursor: pointer; }
+    .fc-dot.active { background: var(--focus); border-color: var(--focus); }
   </style>
 </head>
 <body>
@@ -36,6 +153,14 @@
         <div class="glyph">⏱</div>
         <div class="label">POMODORO</div>
       </div>
+      <div class="icon" ondblclick="openWindow('nova')">
+        <div class="glyph">💬</div>
+        <div class="label">NOVA.EXE</div>
+      </div>
+      <div class="icon" ondblclick="openWindow('flashcards')">
+        <div class="glyph">📇</div>
+        <div class="label">FLASHCARDS</div>
+      </div>
       <div class="icon" ondblclick="openWindow('log')">
         <div class="glyph">🗒</div>
         <div class="label">SESSION LOG</div>
@@ -44,7 +169,7 @@
         <div class="glyph">?</div>
         <div class="label">HELP</div>
       </div>
-      <div class="icon" ondblclick="openWindow('help')">
+      <div class="icon" ondblclick="openWindow('shop')">
         <div class="glyph">🛒</div>
         <div class="label">SHOP</div>
       </div>
@@ -54,7 +179,7 @@
       </div>
     </div>
 
-    <div class="window" id="win-pomodoro" style="left:calc(50% - 180px); top:36px;">
+    <div class="window" id="win-pomodoro" style="left:calc(50% - 220px); top:50px;">
       <div class="titlebar" data-handle>
         <span class="name">POMODORO</span>
         <div class="winbtns">
@@ -68,7 +193,6 @@
           <button class="mode-tab" data-mode="short" onclick="switchMode('short')">SHORT</button>
           <button class="mode-tab" data-mode="long" onclick="switchMode('long')">LONG</button>
         </div>
-
         <div class="ring" id="ring">
           <div class="ring-center">
             <div class="mode-label" id="mode-label">STUDY</div>
@@ -76,23 +200,89 @@
             <div class="pips" id="pips"></div>
           </div>
         </div>
-
         <div class="controls">
           <button class="btn primary" id="start-btn" onclick="toggleTimer()">START</button>
           <button class="btn danger" onclick="resetTimer()">RESET</button>
         </div>
-
         <div class="settings">
           <div class="row" id="study"><span>Study session duration (min)</span><input id="set-focus" type="number" value="25" min="1"></div>
           <div class="row" id="short"><span>Short break duration (min)</span><input id="set-short" type="number" value="5" min="1"></div>
           <div class="row" id="long"><span>Long break duration (min)</span><input id="set-long" type="number" value="15" min="1"></div>
-          <div class="row"><span>Session details</span><textarea id="session-details" type="text" placeholder="Enter text here" min="1"></textarea></div>
+          <div class="row"><span>Session details</span><textarea id="session-details" placeholder="Enter text here"></textarea></div>
           <button class="btn apply" onclick="applySettings()">APPLY</button>
         </div>
       </div>
     </div>
 
-    <div class="window" id="win-log" style="left:calc(50% - 180px + 60px); top:120px; display:none;">
+    <div class="window" id="win-nova" style="left:calc(50% + 20px); top:50px;">
+      <div class="titlebar" data-handle>
+        <span class="name">NOVA.EXE</span>
+        <div class="winbtns">
+          <button class="winbtn" onclick="minimizeWindow('nova')">—</button>
+          <button class="winbtn" onclick="closeWindow('nova')">×</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="messages" id="messages">
+          <div class="empty-state" id="emptyState">
+            <div class="glyph">💬</div>
+            <div class="hint">ASK NOVA ANYTHING — YOUR AI STUDY BUDDY</div>
+          </div>
+        </div>
+        <div class="typing-indicator" id="typing">NOVA IS THINKING ...</div>
+        <div class="chat-error" id="chatError"></div>
+        <div class="input-bar">
+          <input type="text" id="chatInput" placeholder="Ask Nova a question..." autocomplete="off">
+          <button class="btn primary" id="sendBtn">SEND</button>
+          <button class="btn danger" id="clearBtn" title="Clear conversation">CLR</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="window" id="win-flashcards" style="left:calc(50% - 200px); top:150px; display:none;">
+      <div class="titlebar" data-handle>
+        <span class="name">FLASHCARDS.EXE</span>
+        <div class="winbtns">
+          <button class="winbtn" onclick="minimizeWindow('flashcards')">—</button>
+          <button class="winbtn" onclick="closeWindow('flashcards')">×</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="fc-input-area">
+          <textarea id="fcInput" placeholder="Paste study conversation or describe a topic..."></textarea>
+        </div>
+        <button class="btn primary" id="fcGenBtn">GENERATE</button>
+        <div class="fc-error" id="fcError"></div>
+        <div class="fc-loading" id="fcLoading">GENERATING FLASHCARDS ...</div>
+
+        <div class="fc-deck" id="fcDeck">
+          <div class="fc-card-wrapper" id="fcCardWrapper">
+            <div class="fc-card" id="fcCard">
+              <div class="fc-face fc-front">
+                <div class="fc-meta">
+                  <span class="fc-subject" id="fcSubject"></span>
+                  <span class="fc-diff" id="fcDiff"></span>
+                </div>
+                <p class="fc-text" id="fcQuestion"></p>
+                <span class="fc-hint">CLICK TO FLIP</span>
+              </div>
+              <div class="fc-face fc-back">
+                <p class="fc-text" id="fcAnswer"></p>
+                <span class="fc-hint">CLICK TO FLIP BACK</span>
+              </div>
+            </div>
+          </div>
+          <div class="fc-nav">
+            <button class="btn" id="fcPrev">◄ PREV</button>
+            <span class="fc-counter" id="fcCounter">1 / 1</span>
+            <button class="btn" id="fcNext">NEXT ►</button>
+          </div>
+          <div class="fc-dots" id="fcDots"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="window" id="win-log" style="left:calc(50% - 120px); top:120px; display:none;">
       <div class="titlebar" data-handle>
         <span class="name">SESSION_LOG.TXT</span>
         <div class="winbtns">
@@ -106,7 +296,7 @@
       </div>
     </div>
 
-    <div class="window" id="win-help" style="left:calc(50% - 180px + 60px); top:120px; display:none;">
+    <div class="window" id="win-help" style="left:calc(50% - 120px); top:120px; display:none;">
       <div class="titlebar" data-handle>
         <span class="name">HELP_CENTER.TXT</span>
         <div class="winbtns">
@@ -117,28 +307,13 @@
       <div class="content">
         <div class="log-header" style="font-size: 12.5px;">Frequently Asked Questions (FAQ)</div>
         <div class="log-header">
-          <b>-What is Pomodoro?</b>
-          <br>
-          <p>The pomodoro technique is a popular time management method that enhances productivity and prevents burnout by separating work into timed intervals with short breaks in between.</p>
-          <p>It was invented in the late 1980s by a procrastination-prone Italian university student named Francesco Cirillo.</p>
-          <p>Fun fact: The technique's name can be attributed to Cirillo's tomato-shaped kitchen timer, with Pomodoro being the Italian word for tomato.</p>
-        </div>
-        <div class="log-header">
-          <b>-How can I use the Pomodoro technique?</b>
-          <br>
-          <p style="margin-bottom: 0rem;">The structure of the Pomodoro technique is as follows:</p>
-          <ol>
-            <li>Choose a simple task or part of a larger one to focus on.</li>
-            <li><b>Study Session</b> (25 minutes)</li>
-            <li><b>Short Break</b> (5 minutes)</li>
-            <li>Repeat previous two steps three more times</li>
-            <li>After completing four "Pomodoros" (Study Sessions), take a <b>Long Break</b> (15 minutes)</li>
-          </ol>
+          <b>- What is Pomodoro?</b><br>
+          <p>The pomodoro technique is a popular time management method...</p>
         </div>
       </div>
     </div>
 
-    <div class="window" id="win-music" style="left:calc(50% - 180px + 60px); top:120px; display:none;">
+    <div class="window" id="win-music" style="left:calc(50% - 120px); top:120px; display:none;">
       <div class="titlebar" data-handle>
         <span class="name">MUSIC</span>
         <div class="winbtns">
@@ -147,11 +322,9 @@
         </div>
       </div>
       <div class="content">
-        <div class="log-header">TODAY'S SESSIONS</div>
+        <div class="log-header">NOW PLAYING</div>
         <div id="music-panel">
-          <div id="vinyl-player">
-            <img id="vinyl" src="record.png">
-          </div>
+          <div id="vinyl-player"><img id="vinyl" src="record.png"></div>
           <div id="player">
             <div id="song-name">Song Name</div>
             <div id="artist-name" class="log-header">Artist Name</div>
@@ -162,12 +335,13 @@
         </div>
       </div>
     </div>
-  </div>
 
-  <div id="taskbar">
+  </div> <div id="taskbar">
     <button id="start-btn-main" onclick="toggleStartMenu()">≡ FOCUS OS</button>
     <div id="start-menu">
       <div class="menu-item" onclick="openWindow('pomodoro'); toggleStartMenu()">⏱ Pomodoro</div>
+      <div class="menu-item" onclick="openWindow('nova'); toggleStartMenu()">💬 Nova AI</div>
+      <div class="menu-item" onclick="openWindow('flashcards'); toggleStartMenu()">📇 Flashcards</div>
       <div class="menu-item" onclick="openWindow('log'); toggleStartMenu()">🗒 Session Log</div>
       <div class="menu-item" onclick="openWindow('help'); toggleStartMenu()">? Help</div>
       <div class="menu-item" onclick="openWindow('shop'); toggleStartMenu()">🛒 Shop</div>
@@ -180,6 +354,9 @@
   <script src="script2.js"></script>
 
   <script>
+    // ==========================================
+    // 1. STARFIELD CANVAS ANIMATION
+    // ==========================================
     (() => {
         const canvas = document.getElementById('space-bg');
         const ctx = canvas.getContext('2d');
@@ -196,18 +373,16 @@
             stars = [];
             const baseStarCount = Math.floor((canvas.width * canvas.height) / 3500);
 
-            // 1. High-Luminosity Ambient Stars 
             for (let i = 0; i < baseStarCount; i++) {
                 stars.push({
                     x: Math.random() * canvas.width,
                     y: Math.random() * canvas.height,
-                    size: (Math.random() * 1.35) + 0.6, // Fattened sub-pixels
-                    alpha: (Math.random() * 0.5) + 0.5, // Brightness floor sits at 50%
+                    size: (Math.random() * 1.35) + 0.6,
+                    alpha: (Math.random() * 0.5) + 0.5,
                     alphaChange: (Math.random() * 0.018) - 0.009
                 });
             }
 
-            // 2. Galaxy Cluster (Bumped presence, kept small)
             const clusterCount = Math.floor(baseStarCount * 0.95);
             for (let i = 0; i < clusterCount; i++) {
                 const startX = Math.random() * canvas.width;
@@ -215,7 +390,7 @@
                 stars.push({
                     x: startX, y: startY,
                     size: (Math.random() * 0.85) + 0.2, 
-                    alpha: (Math.random() * 0.45) + 0.35, // Floor raised to 35%
+                    alpha: (Math.random() * 0.45) + 0.35,
                     alphaChange: (Math.random() * 0.012) - 0.006
                 });
             }
@@ -232,7 +407,7 @@
                     this.y = Math.random() * (canvas.height * 0.5);
                 }
                 this.len = (Math.random() * 60) + 45;
-                this.speed = (Math.random() * 4.5) + 7; // Maintained the majestic slow drift
+                this.speed = (Math.random() * 4.5) + 7;
                 this.size = (Math.random() * 1.3) + 0.9;
                 this.angle = Math.PI / 3.8; 
                 this.opacity = 0;
@@ -264,7 +439,7 @@
                 ctx.save();
                 const gradient = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
                 gradient.addColorStop(0, `rgba(255, 255, 255, ${this.opacity})`);
-                gradient.addColorStop(0.15, `rgba(255, 228, 195, ${this.opacity * 0.85})`); // Hotter core
+                gradient.addColorStop(0.15, `rgba(255, 228, 195, ${this.opacity * 0.85})`);
                 gradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
                 ctx.lineWidth = this.size;
                 ctx.lineCap = "round";
@@ -293,7 +468,6 @@
 
             stars.forEach(s => {
                 s.alpha += s.alphaChange;
-                // Hard clamp: Stars cannot drop below 40% opacity
                 if (s.alpha <= 0.4 || s.alpha >= 1) s.alphaChange *= -1; 
                 ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
                 ctx.fillRect(s.x, s.y, s.size, s.size);
@@ -306,6 +480,200 @@
         resize();
         animate();
     })();
+
+
+    // ==========================================
+    // 2. NOVA.EXE CHAT LOGIC
+    // ==========================================
+    const messagesEl = document.getElementById('messages');
+    const emptyState = document.getElementById('emptyState');
+    const typingEl   = document.getElementById('typing');
+    const chatError  = document.getElementById('chatError');
+    const chatInput  = document.getElementById('chatInput');
+    const sendBtn    = document.getElementById('sendBtn');
+    const clearBtn   = document.getElementById('clearBtn');
+
+    let sending = false;
+
+    function addMessage(role, text) {
+      emptyState.style.display = 'none';
+      const msg = document.createElement('div');
+      msg.className = 'msg ' + (role === 'user' ? 'msg-user' : 'msg-nova');
+
+      const label = document.createElement('div');
+      label.className = 'msg-label';
+      label.textContent = role === 'user' ? 'YOU' : 'NOVA';
+
+      const body = document.createElement('div');
+      body.className = 'msg-body'; body.textContent = text;
+
+      msg.appendChild(label); msg.appendChild(body);
+      messagesEl.appendChild(msg);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = chatInput.value.trim(); chatError.textContent = '';
+      if (!text || sending) return;
+
+      addMessage('user', text); chatInput.value = '';
+      sending = true; sendBtn.disabled = true; typingEl.classList.add('visible');
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        if (data.error) { chatError.textContent = data.error; return; }
+        addMessage('assistant', data.reply);
+      } catch (err) {
+        chatError.textContent = 'FAILED TO CONNECT TO SERVER.';
+      } finally {
+        sending = false; sendBtn.disabled = false; typingEl.classList.remove('visible'); chatInput.focus();
+      }
+    }
+
+    async function clearChat() {
+      try {
+        await fetch('/api/chat/clear', { method: 'POST' });
+        messagesEl.innerHTML = ''; messagesEl.appendChild(emptyState);
+        emptyState.style.display = 'flex'; chatError.textContent = '';
+      } catch (err) { chatError.textContent = 'FAILED TO CLEAR CHAT.'; }
+    }
+
+    async function loadHistory() {
+      try {
+        const res = await fetch('/api/chat/history'); const data = await res.json();
+        if (data.messages && data.messages.length > 0) {
+          data.messages.forEach(function(msg) { addMessage(msg.role, msg.content); });
+        }
+      } catch (err) {}
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    clearBtn.addEventListener('click', clearChat);
+    chatInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+    });
+
+    loadHistory();
+
+
+    // ==========================================
+    // 3. FLASHCARDS.EXE LOGIC
+    // ==========================================
+    let fcCards = [];
+    let fcIndex = 0;
+    let fcFlipped = false;
+
+    const fcCard      = document.getElementById('fcCard');
+    const fcCardWrap  = document.getElementById('fcCardWrapper');
+    const fcDeck      = document.getElementById('fcDeck');
+    const fcQuestion  = document.getElementById('fcQuestion');
+    const fcAnswer    = document.getElementById('fcAnswer');
+    const fcSubject   = document.getElementById('fcSubject');
+    const fcDiff      = document.getElementById('fcDiff');
+    const fcCounter   = document.getElementById('fcCounter');
+    const fcDotsEl    = document.getElementById('fcDots');
+    const fcGenBtn    = document.getElementById('fcGenBtn');
+    const fcInput     = document.getElementById('fcInput');
+    const fcErrorEl   = document.getElementById('fcError');
+    const fcLoadingEl = document.getElementById('fcLoading');
+    const fcPrevBtn   = document.getElementById('fcPrev');
+    const fcNextBtn   = document.getElementById('fcNext');
+
+    function fcRender(index) {
+      const card = fcCards[index];
+      if (!card) return;
+
+      if (fcFlipped) { fcCard.classList.remove('flipped'); fcFlipped = false; }
+
+      fcQuestion.textContent = card.question;
+      fcAnswer.textContent = card.answer;
+      fcSubject.textContent = card.subject;
+
+      const diff = card.difficulty;
+      fcDiff.textContent = diff;
+      fcDiff.className = 'fc-diff fc-diff-' + diff;
+      fcCard.className = 'fc-card fc-glow-' + diff;
+      fcCounter.textContent = (index + 1) + ' / ' + fcCards.length;
+
+      document.querySelectorAll('.fc-dot').forEach(function(d, i) {
+        d.classList.toggle('active', i === index);
+      });
+    }
+
+    function fcBuildDots() {
+      fcDotsEl.innerHTML = '';
+      for (let i = 0; i < fcCards.length; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'fc-dot' + (i === 0 ? ' active' : '');
+        dot.addEventListener('click', function() { fcIndex = i; fcRender(i); });
+        fcDotsEl.appendChild(dot);
+      }
+    }
+
+    function fcFlip() {
+      fcFlipped = !fcFlipped;
+      fcCard.classList.toggle('flipped', fcFlipped);
+    }
+
+    function fcNext() {
+      if (fcCards.length === 0) return;
+      fcIndex = (fcIndex + 1) % fcCards.length;
+      fcRender(fcIndex);
+    }
+
+    function fcPrev() {
+      if (fcCards.length === 0) return;
+      fcIndex = (fcIndex - 1 + fcCards.length) % fcCards.length;
+      fcRender(fcIndex);
+    }
+
+    async function fcGenerate() {
+      const text = fcInput.value.trim(); fcErrorEl.textContent = '';
+      if (!text) { fcErrorEl.textContent = 'ENTER STUDY TEXT FIRST.'; return; }
+
+      fcGenBtn.disabled = true; fcLoadingEl.classList.add('visible');
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text })
+        });
+        const data = await res.json();
+        if (data.error) { fcErrorEl.textContent = data.error; return; }
+        if (!data.cards || data.cards.length === 0) {
+          fcErrorEl.textContent = 'NO CARDS GENERATED. ADD MORE DETAIL.'; return;
+        }
+
+        fcCards = data.cards; fcIndex = 0; fcFlipped = false;
+        fcBuildDots(); fcRender(0); fcDeck.classList.add('visible');
+      } catch (err) {
+        fcErrorEl.textContent = 'FAILED TO CONNECT TO SERVER.';
+      } finally {
+        fcGenBtn.disabled = false; fcLoadingEl.classList.remove('visible');
+      }
+    }
+
+    fcCardWrap.addEventListener('click', fcFlip);
+    fcPrevBtn.addEventListener('click', fcPrev);
+    fcNextBtn.addEventListener('click', fcNext);
+    fcGenBtn.addEventListener('click', fcGenerate);
+
+    // Context-Aware Keyboard Navigator 
+    document.addEventListener('keydown', function(e) {
+      const fcWindowEl = document.getElementById('win-flashcards');
+      // Ignore keypresses if Flashcard window is hidden or user is actively typing inside an input/textarea
+      if (!fcWindowEl || fcWindowEl.style.display === 'none') return;
+      if (['TEXTAREA', 'INPUT'].includes(e.target.tagName)) return;
+
+      if (e.key === 'ArrowLeft') fcPrev();
+      else if (e.key === 'ArrowRight') fcNext();
+      else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); fcFlip(); }
+    });
+
   </script>
 </body>
 </html>
