@@ -3,6 +3,7 @@ const windows = {
     pomodoro: { elem: document.getElementById(`win-pomodoro`), title: `⏱ Pomodoro` },
     log: { elem: document.getElementById(`win-log`),      title: `🗒 Session Log` },
     help: {elem: document.getElementById(`win-help`), title: `? Help`},
+    music: {elem: document.getElementById(`win-music`), title: `♫ Music`}
 };
 let zCounter = 10;
 

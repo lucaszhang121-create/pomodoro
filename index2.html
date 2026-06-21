@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -6,8 +7,28 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="style2.css">
+
+  <style>
+    /* NUCLEAR OVERRIDE: Forces all container layers to become transparent glass */
+    html, body, #desktop {
+      background: transparent !important;
+      background-image: none !important;
+    }
+
+    #space-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -100;
+      pointer-events: none; 
+    }
+  </style>
 </head>
 <body>
+
+  <canvas id="space-bg"></canvas>
 
   <div id="desktop">
     <div class="icons">
@@ -23,9 +44,16 @@
         <div class="glyph">?</div>
         <div class="label">HELP</div>
       </div>
+      <div class="icon" ondblclick="openWindow('help')">
+        <div class="glyph">🛒</div>
+        <div class="label">SHOP</div>
+      </div>
+      <div class="icon" ondblclick="openWindow('music')">
+        <div class="glyph">♫</div>
+        <div class="label">MUSIC</div>
+      </div>
     </div>
 
-    <!-- Pomodoro window -->
     <div class="window" id="win-pomodoro" style="left:calc(50% - 180px); top:36px;">
       <div class="titlebar" data-handle>
         <span class="name">POMODORO.EXE</span>
@@ -64,7 +92,6 @@
       </div>
     </div>
 
-    <!-- Session Log window -->
     <div class="window" id="win-log" style="left:calc(50% - 180px + 60px); top:120px; display:none;">
       <div class="titlebar" data-handle>
         <span class="name">SESSION_LOG.TXT</span>
@@ -110,6 +137,20 @@
         </div>
       </div>
     </div>
+
+    <div class="window" id="win-music" style="left:calc(50% - 180px + 60px); top:120px; display:none;">
+      <div class="titlebar" data-handle>
+        <span class="name">MUSIC</span>
+        <div class="winbtns">
+          <button class="winbtn" onclick="minimizeWindow('log')">—</button>
+          <button class="winbtn" onclick="closeWindow('log')">×</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="log-header">TODAY'S SESSIONS</div>
+        <div id="log-list"></div>
+      </div>
+    </div>
   </div>
 
   <div id="taskbar">
@@ -123,5 +164,134 @@
   </div>
 
   <script src="script2.js"></script>
+
+  <script>
+    (() => {
+        const canvas = document.getElementById('space-bg');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+        const shootingStars = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            const baseStarCount = Math.floor((canvas.width * canvas.height) / 3500);
+
+            // 1. High-Luminosity Ambient Stars 
+            for (let i = 0; i < baseStarCount; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: (Math.random() * 1.35) + 0.6, // Fattened sub-pixels
+                    alpha: (Math.random() * 0.5) + 0.5, // Brightness floor sits at 50%
+                    alphaChange: (Math.random() * 0.018) - 0.009
+                });
+            }
+
+            // 2. Galaxy Cluster (Bumped presence, kept small)
+            const clusterCount = Math.floor(baseStarCount * 0.95);
+            for (let i = 0; i < clusterCount; i++) {
+                const startX = Math.random() * canvas.width;
+                const startY = (canvas.height - (startX * (canvas.height / canvas.width))) + ((Math.random() - 0.5) * (canvas.height * 0.45));
+                stars.push({
+                    x: startX, y: startY,
+                    size: (Math.random() * 0.85) + 0.2, 
+                    alpha: (Math.random() * 0.45) + 0.35, // Floor raised to 35%
+                    alphaChange: (Math.random() * 0.012) - 0.006
+                });
+            }
+        }
+
+        class ShootingStar {
+            constructor() { this.reset(); }
+            reset() {
+                if (Math.random() > 0.5) {
+                    this.x = Math.random() * canvas.width;
+                    this.y = -10;
+                } else {
+                    this.x = canvas.width + 10;
+                    this.y = Math.random() * (canvas.height * 0.5);
+                }
+                this.len = (Math.random() * 60) + 45;
+                this.speed = (Math.random() * 4.5) + 7; // Maintained the majestic slow drift
+                this.size = (Math.random() * 1.3) + 0.9;
+                this.angle = Math.PI / 3.8; 
+                this.opacity = 0;
+                this.fadeIn = true;
+                this.delay = (Math.random() * 400) + 150; 
+            }
+
+            update() {
+                if (this.delay > 0) { this.delay--; return; }
+                this.x -= Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+                
+                if (this.fadeIn) {
+                    this.opacity += 0.06; 
+                    if (this.opacity >= 1) { this.opacity = 1; this.fadeIn = false; }
+                } else { 
+                    this.opacity -= 0.018; 
+                }
+
+                if (this.x < -this.len || this.y > canvas.height + this.len || this.opacity <= 0) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                if (this.delay > 0 || this.opacity <= 0) return;
+                const tailX = this.x + (Math.cos(this.angle) * this.len);
+                const tailY = this.y - (Math.sin(this.angle) * this.len);
+                ctx.save();
+                const gradient = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
+                gradient.addColorStop(0, `rgba(255, 255, 255, ${this.opacity})`);
+                gradient.addColorStop(0.15, `rgba(255, 228, 195, ${this.opacity * 0.85})`); // Hotter core
+                gradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
+                ctx.lineWidth = this.size;
+                ctx.lineCap = "round";
+                ctx.strokeStyle = gradient;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(tailX, tailY);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        window.addEventListener('resize', resize);
+        shootingStars.push(new ShootingStar(), new ShootingStar());
+
+        function animate() {
+            const bgGrad = ctx.createRadialGradient(
+                canvas.width * 0.6, canvas.height * 0.3, 10,
+                canvas.width * 0.6, canvas.height * 0.3, canvas.width * 0.8
+            );
+            bgGrad.addColorStop(0, '#0a0b16');   
+            bgGrad.addColorStop(0.6, '#04040a'); 
+            bgGrad.addColorStop(1, '#010103');   
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            stars.forEach(s => {
+                s.alpha += s.alphaChange;
+                // Hard clamp: Stars cannot drop below 40% opacity
+                if (s.alpha <= 0.4 || s.alpha >= 1) s.alphaChange *= -1; 
+                ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+                ctx.fillRect(s.x, s.y, s.size, s.size);
+            });
+
+            shootingStars.forEach(ss => { ss.update(); ss.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        resize();
+        animate();
+    })();
+  </script>
 </body>
 </html>
