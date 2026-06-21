@@ -377,6 +377,7 @@ body {
 
 .log-row {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-evenly;
     font-size: 11px;
     border-bottom: 1px solid var(--track);
@@ -709,4 +710,12 @@ li {
 #taskbar {
   position: relative;
   z-index: 600;
+}
+
+.log-details {
+  font-size: 9px;
+  color: var(--muted);
+  width: 100%;
+  margin-top: 2px;
+  text-align: center;
 }
