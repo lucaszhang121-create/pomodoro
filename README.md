@@ -27,22 +27,22 @@ Every study session with the Pomodoro Technique generates Credits, allowing you 
 After using the Pomodoro timer, the Session Log app will have a record of when each session was completed, how long it took, and the task goal.
 <img width="465" height="156" alt="Screenshot 2026-06-21 at 2 02 20 PM" src="https://github.com/user-attachments/assets/21992973-db44-4b37-8d1e-d20ed31b3a72" />
 
-<h3>Nova AI:</h3>
+<br><h3>Nova AI:</h3>
 Nova AI is a trained assistant that is specifically designed for studying and helping students understand concepts. It uses the OpenAI API to accomplish this purpose.<br>
 <img width="465" height="61<img width="465" height="538" alt="Screenshot 2026-06-21 at 1 58 51 PM" src="https://github.com/user-attachments/assets/60c31eaf-3397-400d-8be6-f935d81800ad" />
 
-<h3>Flashcards:</h3>
+<br><h3>Flashcards:</h3>
 Flashcards function using CohereAI and after getting prompted by the user for a subject, creates flashcards in the JSON format which are later turned into flashcards.
 <img width="465" height="538" alt="Screenshot 2026-06-21 at 2 01 42 PM" src="https://github.com/user-attachments/assets/9600a9a9-170e-4730-9ef8-f09923f459b6" />
 
-<h3>Music:</h3>
+<br><h3>Music:</h3>
 The format of the audio player is simple. Click "⏮" to go to the last song, "⏭" to go to the next one, and ►⏸ to play the selected choice.
 <img width="386" height="274" alt="Screenshot 2026-06-21 at 2 02 54 PM" src="https://github.com/user-attachments/assets/5d1e6509-79a3-4cc2-9b7a-ac7b45a7c1ca" />
 
-<h3>Shop:</h3>
+<br><h3>Shop:</h3>
 The shop is an app where users can purchase themes and colors to customize the experience and planets to continue the storyline.
 <img width="386" height="428" alt="Screenshot 2026-06-21 at 2 03 18 PM" src="https://github.com/user-attachments/assets/de23ae8d-09f8-4cac-8c5f-0e2c2106364d" />
 
-<h3>Achievements:</h3>
+<br><h3>Achievements:</h3>
 Lists user data include total minutes, best streak, etc.
 <img width="386" height="428" alt="Screenshot 2026-06-21 at 2 03 59 PM" src="https://github.com/user-attachments/assets/c506a0d1-6933-4e1b-a964-bf776d2cf447" />
