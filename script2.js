@@ -273,6 +273,60 @@ function renderLog(){
   }
 }
 
+const songs = [ 
+  {song: "Falling Behind", artist: "Luffy", elem: document.getElementById(`falling-behind`)},
+  {song: "From the Start", artist: "Luffy", elem: document.getElementById(`from-the-start`)},
+  {song: "Interstellar", artist: "Hans Zimmer", elem: document.getElementById(`interstellar`)},
+]
+let currentIndex = 0;
+function playSong(id, toggle){
+  document.getElementById(`song-name`).textContent = songs[id].song;
+  document.getElementById(`artist-name`).textContent = songs[id].artist;
+  if (toggle){
+    if (songs[id].elem.paused){
+      songs[id].elem.play();
+      document.getElementById(`vinyl`).style.animationPlayState = "running";
+    } else {
+      songs[id].elem.pause();
+      document.getElementById(`vinyl`).style.animationPlayState = "paused";
+    }
+  } else {
+    songs[id].elem.play();
+    document.getElementById(`vinyl`).style.animationPlayState = "running";
+  }
+}
+function songFinished(){
+  songs[currentIndex].elem.pause();
+  document.getElementById(`vinyl`).style.animationPlayState = "paused";
+  songs[currentIndex].elem.currentTime = 0;
+  currentIndex++;
+  if (currentIndex >= songs.length){
+    currentIndex = 0;
+  }
+  playSong(currentIndex, null);
+}
+function lastSong(){
+  songs[currentIndex].elem.pause();
+  document.getElementById(`vinyl`).style.animationPlayState = "paused";
+  songs[currentIndex].elem.currentTime = 0;
+  if (currentIndex == 0){
+    currentIndex = songs.length - 1;
+  } else {
+    currentIndex--;
+  }
+  playSong(currentIndex, null);
+}
+function nextSong(){
+  songs[currentIndex].elem.pause();
+  document.getElementById(`vinyl`).style.animationPlayState = "paused";
+  songs[currentIndex].elem.currentTime = 0;
+  currentIndex++;
+  if (currentIndex >= songs.length){
+    currentIndex = 0;
+  }
+  playSong(currentIndex, null);
+}
+
 //Init
 renderTimer();
 renderLog();
