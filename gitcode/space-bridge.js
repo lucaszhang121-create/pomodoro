@@ -54,6 +54,23 @@ let last = 0;
 let container = null;
 let advanceQueue = [];
 
+// UFO animation
+let ufoAnim = null;
+let ufoTexNormal = null;
+let ufoTexLaser = null;
+let ufoGlowTex = null;
+
+function makeGlowTex() {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const x = c.getContext('2d');
+  const g = x.createRadialGradient(64, 64, 0, 64, 64, 64);
+  g.addColorStop(0, 'rgba(100,220,255,1)');
+  g.addColorStop(0.3, 'rgba(0,160,255,0.6)');
+  g.addColorStop(1, 'rgba(0,40,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 128, 128);
+  const t = new THREE.CanvasTexture(c); t.needsUpdate = true; return t;
+}
+
 // ---- Init ----
 function init() {
   if (initialized) return;
@@ -114,6 +131,10 @@ function loadTextures() {
       restoreState();
       updateLabel();
       buildDots();
+      const tl = new THREE.TextureLoader();
+      ufoTexNormal = tl.load('WIthoutLaser.png');
+      ufoTexLaser = tl.load('WithLaser.png');
+      ufoGlowTex = makeGlowTex();
     });
 }
 
@@ -263,6 +284,7 @@ function loop(now) {
   if (kuiper) updateBelt(kuiper, dt);
   if (comets.length) updateComets(comets, dt);
   explosions.update(dt);
+  updateUfoAnimation(dt);
   updateCamera(dt);
   composer.render();
 
@@ -288,7 +310,53 @@ function detonateAndTravel(toStep) {
   const toIndex = PROGRESSION[toStep];
   const p = planets[fromIndex];
 
-  if (p && !p.exploded) {
+  viewMode = 'surface';
+  const btn = $('btnSpaceOrbit');
+  if (btn) btn.textContent = 'ORBIT VIEW';
+  mode = 'watching';
+
+  if (p && !p.exploded && ufoTexNormal) {
+    const center = planetWorldPos(p);
+    const r = p.data.radius;
+    const camRight = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+    const camUp = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
+    const hoverOffset = new THREE.Vector3().addScaledVector(camRight, -r * 3).addScaledVector(camUp, r * 2.5);
+    const startPos = center.clone().addScaledVector(camRight, -r * 6).addScaledVector(camUp, r * 4);
+    const hoverPos = center.clone().add(hoverOffset);
+    const endPos = center.clone().addScaledVector(camRight, r * 6).addScaledVector(camUp, r * 3);
+
+    const mat = new THREE.SpriteMaterial({ map: ufoTexNormal, transparent: true, depthWrite: false, opacity: 0 });
+    const sprite = new THREE.Sprite(mat);
+    sprite.position.copy(startPos);
+    sprite.scale.set(r * 1.5, r * 2.0, 1);
+    scene.add(sprite);
+
+    ufoAnim = {
+      phase: 'fly_in', time: 0,
+      sprite, startPos, hoverPos, hoverOffset, endPos,
+      center: center.clone(), r, planet: p,
+      laserLine: null, laserGlow: null, impactGlow: null,
+      origSurfDist: surfDist, origPitch: targetPitch,
+      onExplode: () => {
+        const hit = new THREE.Vector3();
+        p.mesh.getWorldPosition(hit);
+        explosions.detonate(hit, r, p.data.col, p.mesh.material);
+        flashScreen();
+        p.mesh.visible = false;
+        if (p.clouds) p.clouds.visible = false;
+        p.orbitLine.visible = false;
+        p.moonMeshes.forEach(m => m.mesh.visible = false);
+        p.exploded = true;
+        if (!state.explodedPlanets.includes(fromIndex)) state.explodedPlanets.push(fromIndex);
+        state.currentStep = toStep;
+        saveState(state);
+      },
+      onComplete: () => {
+        mode = 'travel';
+        travel = { t: 0, dur: 3.0, fromPos: camera.position.clone(), fromTarget: center.clone(), toIndex };
+      },
+    };
+  } else if (p && !p.exploded) {
     const center = planetWorldPos(p);
     explosions.detonate(center, p.data.radius, p.data.col, p.mesh.material);
     flashScreen();
@@ -297,31 +365,25 @@ function detonateAndTravel(toStep) {
     p.orbitLine.visible = false;
     p.moonMeshes.forEach(m => m.mesh.visible = false);
     p.exploded = true;
-
-    if (!state.explodedPlanets.includes(fromIndex)) {
-      state.explodedPlanets.push(fromIndex);
-    }
+    if (!state.explodedPlanets.includes(fromIndex)) state.explodedPlanets.push(fromIndex);
+    state.currentStep = toStep;
+    saveState(state);
+    const fromTarget = planetWorldPos(p);
+    setTimeout(() => {
+      if (mode !== 'watching') return;
+      mode = 'travel';
+      travel = { t: 0, dur: 3.0, fromPos: camera.position.clone(), fromTarget, toIndex };
+    }, 4000);
+  } else {
+    state.currentStep = toStep;
+    saveState(state);
+    const fromTarget = p ? planetWorldPos(p) : camera.position.clone();
+    setTimeout(() => {
+      if (mode !== 'watching') return;
+      mode = 'travel';
+      travel = { t: 0, dur: 3.0, fromPos: camera.position.clone(), fromTarget, toIndex };
+    }, 1000);
   }
-
-  state.currentStep = toStep;
-  saveState(state);
-
-  viewMode = 'surface';
-  const btn = $('btnSpaceOrbit');
-  if (btn) btn.textContent = 'ORBIT VIEW';
-  mode = 'watching';
-  const fromTarget = p ? planetWorldPos(p) : camera.position.clone();
-
-  setTimeout(() => {
-    if (mode !== 'watching') return;
-    mode = 'travel';
-    travel = {
-      t: 0, dur: 3.0,
-      fromPos: camera.position.clone(),
-      fromTarget,
-      toIndex,
-    };
-  }, 4000);
 
   buildDots();
 }
@@ -331,6 +393,135 @@ function processAdvanceQueue() {
   const nextStep = advanceQueue.shift();
   detonateAndTravel(nextStep);
 }
+
+// ---- UFO animation ----
+function updateUfoAnimation(dt) {
+  if (!ufoAnim) return;
+  const a = ufoAnim;
+  a.time += dt;
+  const ease = k => k < 0.5 ? 2*k*k : 1 - Math.pow(-2*k+2,2)/2;
+
+  // Track planet's live position
+  if (a.planet && a.planet.mesh.visible) {
+    a.planet.mesh.getWorldPosition(a.center);
+    a.hoverPos.copy(a.center).add(a.hoverOffset);
+  }
+
+  if (a.phase === 'fly_in') {
+    const k = Math.min(a.time / 2.0, 1);
+    a.sprite.position.lerpVectors(a.startPos, a.hoverPos, ease(k));
+    a.sprite.material.opacity = Math.min(1, a.time / 0.5);
+    surfDist = lerp(a.origSurfDist, 5.0, ease(k));
+    targetPitch = lerp(a.origPitch, 0.35, ease(k));
+    if (k >= 1) {
+      a.phase = 'laser'; a.time = 0;
+      createBeam(a);
+    }
+  }
+  else if (a.phase === 'laser') {
+    const k = Math.min(a.time / 1.5, 1);
+    // Keep UFO at hover, tracking planet
+    a.sprite.position.copy(a.hoverPos);
+    // Update beam to track planet
+    updateBeam(a);
+    surfDist = 5.0;
+    targetPitch = 0.35;
+    if (k >= 1) {
+      a.phase = 'explode'; a.time = 0;
+      removeBeam(a);
+      a.onExplode();
+    }
+  }
+  else if (a.phase === 'explode') {
+    surfDist = 5.0;
+    if (a.time >= 1.0) { a.phase = 'fly_out'; a.time = 0; }
+  }
+  else if (a.phase === 'fly_out') {
+    const k = Math.min(a.time / 2.0, 1);
+    a.sprite.position.lerpVectors(a.hoverPos, a.endPos, ease(k));
+    if (k > 0.4) a.sprite.material.opacity = Math.max(0, 1 - (k - 0.4) / 0.6);
+    surfDist = lerp(5.0, a.origSurfDist, ease(k));
+    targetPitch = lerp(0.35, a.origPitch, ease(k));
+    if (k >= 1) {
+      surfDist = a.origSurfDist;
+      targetPitch = a.origPitch;
+      scene.remove(a.sprite); a.sprite.material.dispose();
+      const cb = a.onComplete;
+      ufoAnim = null;
+      cb();
+    }
+  }
+}
+
+function createBeam(a) {
+  const from = a.hoverPos;
+  const to = a.center;
+  const dir = new THREE.Vector3().subVectors(to, from);
+  const len = dir.length();
+  const mid = new THREE.Vector3().addVectors(from, to).multiplyScalar(0.5);
+  const dirN = dir.clone().normalize();
+  const yAxis = new THREE.Vector3(0, 1, 0);
+
+  const geo = new THREE.CylinderGeometry(a.r * 0.05, a.r * 0.08, len, 6);
+  const mat = new THREE.MeshBasicMaterial({ color: 0x00ccff, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(mid);
+  mesh.quaternion.setFromUnitVectors(yAxis, dirN);
+  scene.add(mesh);
+  a.laserLine = mesh;
+
+  const gGeo = new THREE.CylinderGeometry(a.r * 0.15, a.r * 0.2, len, 6);
+  const gMat = new THREE.MeshBasicMaterial({ color: 0x0066ff, transparent: true, opacity: 0.25, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+  const gMesh = new THREE.Mesh(gGeo, gMat);
+  gMesh.position.copy(mid);
+  gMesh.quaternion.copy(mesh.quaternion);
+  scene.add(gMesh);
+  a.laserGlow = gMesh;
+
+  if (ufoGlowTex) {
+    const iMat = new THREE.SpriteMaterial({ map: ufoGlowTex, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+    const iSpr = new THREE.Sprite(iMat);
+    iSpr.position.copy(to);
+    iSpr.scale.setScalar(a.r * 1.5);
+    scene.add(iSpr);
+    a.impactGlow = iSpr;
+  }
+}
+
+function updateBeam(a) {
+  const from = a.hoverPos;
+  const to = a.center;
+  const dir = new THREE.Vector3().subVectors(to, from);
+  const len = dir.length();
+  const mid = new THREE.Vector3().addVectors(from, to).multiplyScalar(0.5);
+  const dirN = dir.clone().normalize();
+  const yAxis = new THREE.Vector3(0, 1, 0);
+
+  if (a.laserLine) {
+    a.laserLine.position.copy(mid);
+    a.laserLine.quaternion.setFromUnitVectors(yAxis, dirN);
+    a.laserLine.scale.y = len / (a.laserLine.geometry.parameters.height || 1);
+    a.laserLine.material.opacity = 0.6 + Math.sin(a.time * 25) * 0.3;
+  }
+  if (a.laserGlow) {
+    a.laserGlow.position.copy(mid);
+    a.laserGlow.quaternion.setFromUnitVectors(yAxis, dirN);
+    a.laserGlow.scale.y = len / (a.laserGlow.geometry.parameters.height || 1);
+    a.laserGlow.material.opacity = 0.2 + Math.sin(a.time * 20) * 0.1;
+  }
+  if (a.impactGlow) {
+    a.impactGlow.position.copy(to);
+    a.impactGlow.material.opacity = 0.7 + Math.sin(a.time * 18) * 0.25;
+    a.impactGlow.scale.setScalar(a.r * (1.5 + Math.sin(a.time * 15) * 0.4));
+  }
+}
+
+function removeBeam(a) {
+  if (a.laserLine) { scene.remove(a.laserLine); a.laserLine.geometry.dispose(); a.laserLine.material.dispose(); a.laserLine = null; }
+  if (a.laserGlow) { scene.remove(a.laserGlow); a.laserGlow.geometry.dispose(); a.laserGlow.material.dispose(); a.laserGlow = null; }
+  if (a.impactGlow) { scene.remove(a.impactGlow); a.impactGlow.material.dispose(); a.impactGlow = null; }
+}
+
 
 function advanceTo(step) {
   if (!initialized) init();

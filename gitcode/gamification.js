@@ -23,11 +23,11 @@ function loadPlayer(){
     if (raw) {
       const saved = JSON.parse(raw);
       // Force reset: clear all old data and start fresh
-      if (saved._migrated !== 2){
+      if (saved._migrated !== 15){
         localStorage.removeItem(PLAYER_KEY);
         localStorage.removeItem(`focusos_space_progress`);
         const fresh = Object.assign({}, DEFAULT_PLAYER);
-        fresh._migrated = 2;
+        fresh._migrated = 15;
         localStorage.setItem(PLAYER_KEY, JSON.stringify(fresh));
         return fresh;
       }
@@ -35,7 +35,7 @@ function loadPlayer(){
     }
   } catch(e){}
   const fresh = Object.assign({}, DEFAULT_PLAYER);
-  fresh._migrated = 2;
+  fresh._migrated = 15;
   return fresh;
 }
 

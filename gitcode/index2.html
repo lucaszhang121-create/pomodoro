@@ -149,11 +149,22 @@
     .fc-dots { display: flex; gap: 5px; margin-top: 10px; justify-content: center; flex-wrap: wrap; }
     .fc-dot { width: 6px; height: 6px; border: 1px solid var(--muted); background: transparent; cursor: pointer; }
     .fc-dot.active { background: var(--focus); border-color: var(--focus); }
+
+    #ufo-ambient {
+      position: fixed;
+      z-index: -99;
+      pointer-events: none;
+      width: 35px;
+      height: auto;
+      opacity: 0.85;
+      filter: brightness(0.8);
+    }
   </style>
 </head>
 <body>
 
   <canvas id="space-bg"></canvas>
+  <img id="ufo-ambient" src="WIthoutLaser.png" alt="">
 
   <div id="desktop">
     <div class="icons">
@@ -552,6 +563,16 @@
         window.addEventListener('resize', resize);
         shootingStars.push(new ShootingStar(), new ShootingStar());
 
+        const ufoEl = document.getElementById('ufo-ambient');
+        const ufo = {
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight * 0.4 + 40,
+            vx: 0.3, vy: 0.15,
+            tx: Math.random() * window.innerWidth,
+            ty: Math.random() * window.innerHeight * 0.4 + 40,
+            cd: 0, bob: 0
+        };
+
         function animate() {
             const bgGrad = ctx.createRadialGradient(
                 canvas.width * 0.6, canvas.height * 0.3, 10,
@@ -571,6 +592,24 @@
             });
 
             shootingStars.forEach(ss => { ss.update(); ss.draw(); });
+
+            ufo.cd++;
+            ufo.bob += 0.025;
+            if (ufo.cd > 350 || Math.hypot(ufo.x - ufo.tx, ufo.y - ufo.ty) < 30) {
+                ufo.tx = Math.random() * (canvas.width - 80) + 40;
+                ufo.ty = Math.random() * (canvas.height * 0.5) + 30;
+                ufo.cd = 0;
+            }
+            ufo.vx += (ufo.tx - ufo.x) * 0.00015;
+            ufo.vy += (ufo.ty - ufo.y) * 0.00015;
+            ufo.vx *= 0.997;
+            ufo.vy *= 0.997;
+            ufo.x += ufo.vx;
+            ufo.y += ufo.vy;
+            ufoEl.style.left = ufo.x + 'px';
+            ufoEl.style.top = (ufo.y + Math.sin(ufo.bob) * 2.5) + 'px';
+            ufoEl.style.transform = 'rotate(' + (ufo.vx * 3) + 'deg)';
+
             requestAnimationFrame(animate);
         }
 
