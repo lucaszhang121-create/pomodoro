@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOVA.EXE — FocusOS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0D1117;
+      --panel: #2A2E3A;
+      --panel-light: #383D4D;
+      --text: #E8E6F0;
+      --muted: #8B8FA3;
+      --track: #454B5C;
+      --focus: #FF9F1C;
+      --short: #7C5CFF;
+      --long: #3DDC97;
+      --danger: #FF5470;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      color: var(--text);
+      font-family: 'IBM Plex Mono', monospace;
+      overflow: hidden;
+      background: transparent;
+    }
+
+    canvas#space-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: -100;
+      pointer-events: none;
+    }
+
+    .page {
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* ---------- Window chrome ---------- */
+    .window {
+      display: flex;
+      flex-direction: column;
+      width: 440px;
+      height: 580px;
+      background: var(--panel);
+      border: 1px solid #11141b;
+      box-shadow: 6px 6px 0 rgba(0,0,0,0.45);
+      z-index: 1;
+    }
+
+    .titlebar {
+      height: 32px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      background: linear-gradient(to bottom, var(--panel-light), var(--panel));
+      border-bottom: 1px solid #11141b;
+    }
+
+    .titlebar .name {
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--text);
+    }
+
+    .winbtns { display: flex; gap: 6px; }
+
+    .winbtn {
+      width: 18px; height: 18px;
+      border: 1px solid var(--muted);
+      background: transparent;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+    }
+    .winbtn:hover { border-color: var(--text); color: var(--text); }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ---------- Messages ---------- */
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .messages::-webkit-scrollbar { width: 6px; }
+    .messages::-webkit-scrollbar-track { background: var(--bg); }
+    .messages::-webkit-scrollbar-thumb { background: var(--track); }
+
+    .msg {
+      max-width: 85%;
+      padding: 8px 10px;
+      font-size: 11px;
+      line-height: 1.6;
+      border: 1px solid var(--track);
+      word-wrap: break-word;
+    }
+
+    .msg-user {
+      align-self: flex-end;
+      background: var(--bg);
+    }
+
+    .msg-nova {
+      align-self: flex-start;
+      background: var(--panel-light);
+    }
+
+    .msg-label {
+      font-size: 9px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .msg-user .msg-label { color: var(--focus); }
+    .msg-nova .msg-label { color: var(--short); }
+
+    .msg-body {
+      color: var(--text);
+      white-space: pre-wrap;
+    }
+
+    .typing-indicator {
+      align-self: flex-start;
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      padding: 6px 0;
+      display: none;
+    }
+    .typing-indicator.visible { display: block; }
+
+    .empty-state {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--muted);
+    }
+    .empty-state .glyph {
+      font-size: 32px;
+      opacity: 0.5;
+    }
+    .empty-state .hint {
+      font-size: 10px;
+      letter-spacing: 0.06em;
+    }
+
+    /* ---------- Input ---------- */
+    .input-bar {
+      flex: none;
+      display: flex;
+      gap: 6px;
+      padding: 10px 12px;
+      border-top: 1px solid #11141b;
+      background: var(--panel);
+    }
+
+    .input-bar input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--track);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 11px;
+      padding: 8px;
+      outline: none;
+    }
+    .input-bar input:focus { border-color: var(--muted); }
+    .input-bar input::placeholder { color: var(--muted); }
+
+    .btn {
+      padding: 8px 14px;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      font-family: inherit;
+      background: var(--bg);
+      border: 1px solid var(--track);
+      color: var(--text);
+      cursor: pointer;
+      flex: none;
+    }
+    .btn:hover { border-color: var(--muted); }
+
+    .btn.primary {
+      background: var(--focus);
+      color: #0D1117;
+      border-color: var(--focus);
+      font-weight: 600;
+    }
+    .btn.primary:hover { opacity: 0.9; }
+    .btn.primary:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+    .chat-error {
+      font-size: 10px;
+      color: var(--danger);
+      padding: 0 12px 6px;
+      min-height: 0;
+      letter-spacing: 0.04em;
+    }
+
+    @media (max-width: 480px) {
+      .window { width: 100%; height: 100%; }
+      .page { padding: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="space-bg"></canvas>
+
+  <div class="page">
+    <div class="window">
+      <div class="titlebar">
+        <span class="name">NOVA.EXE</span>
+        <div class="winbtns">
+          <button class="winbtn" title="Minimize">—</button>
+          <button class="winbtn" title="Close">×</button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="messages" id="messages">
+          <div class="empty-state" id="emptyState">
+            <div class="glyph">💬</div>
+            <div class="hint">ASK NOVA ANYTHING — YOUR AI STUDY BUDDY</div>
+          </div>
+        </div>
+        <div class="typing-indicator" id="typing">NOVA IS THINKING ...</div>
+        <div class="chat-error" id="chatError"></div>
+        <div class="input-bar">
+          <input type="text" id="chatInput" placeholder="Ask Nova a question..." autocomplete="off">
+          <button class="btn primary" id="sendBtn">SEND</button>
+          <button class="btn danger" id="clearBtn" title="Clear conversation">CLR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ============ STARFIELD ============
+    (() => {
+      const canvas = document.getElementById('space-bg');
+      const ctx = canvas.getContext('2d');
+      let stars = [];
+      const shootingStars = [];
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        initStars();
+      }
+
+      function initStars() {
+        stars = [];
+        const baseCount = Math.floor((canvas.width * canvas.height) / 3500);
+
+        for (let i = 0; i < baseCount; i++) {
+          stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: (Math.random() * 1.35) + 0.6,
+            alpha: (Math.random() * 0.5) + 0.5,
+            alphaChange: (Math.random() * 0.018) - 0.009
+          });
+        }
+
+        const clusterCount = Math.floor(baseCount * 0.95);
+        for (let i = 0; i < clusterCount; i++) {
+          const startX = Math.random() * canvas.width;
+          const startY = (canvas.height - (startX * (canvas.height / canvas.width)))
+                         + ((Math.random() - 0.5) * (canvas.height * 0.45));
+          stars.push({
+            x: startX, y: startY,
+            size: (Math.random() * 0.85) + 0.2,
+            alpha: (Math.random() * 0.45) + 0.35,
+            alphaChange: (Math.random() * 0.012) - 0.006
+          });
+        }
+      }
+
+      class ShootingStar {
+        constructor() { this.reset(); }
+        reset() {
+          if (Math.random() > 0.5) {
+            this.x = Math.random() * canvas.width;
+            this.y = -10;
+          } else {
+            this.x = canvas.width + 10;
+            this.y = Math.random() * (canvas.height * 0.5);
+          }
+          this.len = (Math.random() * 60) + 45;
+          this.speed = (Math.random() * 4.5) + 7;
+          this.size = (Math.random() * 1.3) + 0.9;
+          this.angle = Math.PI / 3.8;
+          this.opacity = 0;
+          this.fadeIn = true;
+          this.delay = (Math.random() * 400) + 150;
+        }
+        update() {
+          if (this.delay > 0) { this.delay--; return; }
+          this.x -= Math.cos(this.angle) * this.speed;
+          this.y += Math.sin(this.angle) * this.speed;
+          if (this.fadeIn) {
+            this.opacity += 0.06;
+            if (this.opacity >= 1) { this.opacity = 1; this.fadeIn = false; }
+          } else {
+            this.opacity -= 0.018;
+          }
+          if (this.x < -this.len || this.y > canvas.height + this.len || this.opacity <= 0) {
+            this.reset();
+          }
+        }
+        draw() {
+          if (this.delay > 0 || this.opacity <= 0) return;
+          const tailX = this.x + (Math.cos(this.angle) * this.len);
+          const tailY = this.y - (Math.sin(this.angle) * this.len);
+          ctx.save();
+          const grad = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
+          grad.addColorStop(0, `rgba(255,255,255,${this.opacity})`);
+          grad.addColorStop(0.15, `rgba(255,228,195,${this.opacity * 0.85})`);
+          grad.addColorStop(1, `rgba(255,255,255,0)`);
+          ctx.lineWidth = this.size;
+          ctx.lineCap = 'round';
+          ctx.strokeStyle = grad;
+          ctx.beginPath();
+          ctx.moveTo(this.x, this.y);
+          ctx.lineTo(tailX, tailY);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      window.addEventListener('resize', resize);
+      shootingStars.push(new ShootingStar(), new ShootingStar());
+
+      function animate() {
+        const bgGrad = ctx.createRadialGradient(
+          canvas.width * 0.6, canvas.height * 0.3, 10,
+          canvas.width * 0.6, canvas.height * 0.3, canvas.width * 0.8
+        );
+        bgGrad.addColorStop(0, '#0a0b16');
+        bgGrad.addColorStop(0.6, '#04040a');
+        bgGrad.addColorStop(1, '#010103');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        stars.forEach(s => {
+          s.alpha += s.alphaChange;
+          if (s.alpha <= 0.4 || s.alpha >= 1) s.alphaChange *= -1;
+          ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+          ctx.fillRect(s.x, s.y, s.size, s.size);
+        });
+
+        shootingStars.forEach(ss => { ss.update(); ss.draw(); });
+        requestAnimationFrame(animate);
+      }
+
+      resize();
+      animate();
+    })();
+
+    // ============ CHAT LOGIC ============
+    const messagesEl = document.getElementById('messages');
+    const emptyState = document.getElementById('emptyState');
+    const typingEl   = document.getElementById('typing');
+    const chatError  = document.getElementById('chatError');
+    const chatInput  = document.getElementById('chatInput');
+    const sendBtn    = document.getElementById('sendBtn');
+    const clearBtn   = document.getElementById('clearBtn');
+
+    let sending = false;
+
+    function addMessage(role, text) {
+      emptyState.style.display = 'none';
+
+      const msg = document.createElement('div');
+      msg.className = 'msg ' + (role === 'user' ? 'msg-user' : 'msg-nova');
+
+      const label = document.createElement('div');
+      label.className = 'msg-label';
+      label.textContent = role === 'user' ? 'YOU' : 'NOVA';
+
+      const body = document.createElement('div');
+      body.className = 'msg-body';
+      body.textContent = text;
+
+      msg.appendChild(label);
+      msg.appendChild(body);
+      messagesEl.appendChild(msg);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const text = chatInput.value.trim();
+      chatError.textContent = '';
+      if (!text || sending) return;
+
+      addMessage('user', text);
+      chatInput.value = '';
+      sending = true;
+      sendBtn.disabled = true;
+      typingEl.classList.add('visible');
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+
+        if (data.error) {
+          chatError.textContent = data.error;
+          return;
+        }
+
+        addMessage('assistant', data.reply);
+      } catch (err) {
+        chatError.textContent = 'FAILED TO CONNECT TO SERVER.';
+      } finally {
+        sending = false;
+        sendBtn.disabled = false;
+        typingEl.classList.remove('visible');
+        chatInput.focus();
+      }
+    }
+
+    async function clearChat() {
+      try {
+        await fetch('/api/chat/clear', { method: 'POST' });
+        messagesEl.innerHTML = '';
+        messagesEl.appendChild(emptyState);
+        emptyState.style.display = 'flex';
+        chatError.textContent = '';
+      } catch (err) {
+        chatError.textContent = 'FAILED TO CLEAR CHAT.';
+      }
+    }
+
+    async function loadHistory() {
+      try {
+        const res = await fetch('/api/chat/history');
+        const data = await res.json();
+        if (data.messages && data.messages.length > 0) {
+          data.messages.forEach(function(msg) {
+            addMessage(msg.role, msg.content);
+          });
+        }
+      } catch (err) {}
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    clearBtn.addEventListener('click', clearChat);
+
+    chatInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    loadHistory();
+  </script>
+</body>
+</html>
