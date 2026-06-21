@@ -18,7 +18,7 @@ def get_ai():
 
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index2.html')
+    return send_from_directory('.', 'index.html')
 
 SPACEPROGRESS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'spaceprogress'))
 
