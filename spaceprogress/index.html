@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOL · Photoreal Solar System — Stand & Detonate</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="scene"></canvas>
+<div class="flash" id="flash"></div>
+
+<!-- Loading -->
+<div id="loader">
+  <div class="load-glyph"></div>
+  <div class="load-title">ASSEMBLING THE SOLAR SYSTEM</div>
+  <div class="load-bar"><div class="load-fill" id="loadFill"></div></div>
+  <div class="load-status" id="loadStatus">Linking modules…</div>
+</div>
+
+<!-- HUD -->
+<div class="hud" id="hud">
+  <div class="topbar">
+    <div class="eyebrow">YOU ARE STANDING ON</div>
+    <div class="planet-name" id="planetName">EARTH</div>
+    <div class="planet-sub" id="planetSub">Third planet from the Sun</div>
+  </div>
+
+  <div class="info-card">
+    <h3>PLANET DATA</h3>
+    <div class="stat"><span class="k">Diameter</span><span class="v" id="dDia">12,742 km</span></div>
+    <div class="stat"><span class="k">Mass</span><span class="v" id="dMass">5.97e24 kg</span></div>
+    <div class="stat"><span class="k">Gravity</span><span class="v" id="dGrav">9.8 m/s²</span></div>
+    <div class="stat"><span class="k">Day length</span><span class="v" id="dDay">24 h</span></div>
+    <div class="stat"><span class="k">Year length</span><span class="v" id="dYear">365.25 d</span></div>
+    <div class="stat"><span class="k">Axial tilt</span><span class="v" id="dTilt">23.4°</span></div>
+    <div class="stat"><span class="k">Moons</span><span class="v" id="dMoons">1</span></div>
+    <div class="stat"><span class="k">Surface temp</span><span class="v" id="dTemp">15 °C</span></div>
+    <div class="stat"><span class="k">Distance ☉</span><span class="v" id="dDist">149.6M km</span></div>
+  </div>
+
+  <div class="progress" id="progress"></div>
+
+  <div class="controls">
+    <button class="btn btn-danger" id="btnExplode">☢ DETONATE THIS WORLD</button>
+    <button class="btn btn-ghost" id="btnOrbit">🛰 ORBIT VIEW</button>
+  </div>
+
+  <div class="quality-toggle">
+    <span class="q-label">RENDER</span>
+    <button class="q-btn" id="qBalanced">BALANCED</button>
+    <button class="q-btn active" id="qUltra">ULTRA</button>
+  </div>
+
+  <div class="hint" id="hint">Drag to look · Scroll to zoom · Detonate to be flung outward to the next world</div>
+  <div class="credit">Imagery: Solar System Scope (CC BY 4.0) · derived from NASA data</div>
+  <div class="fps" id="fps">— fps</div>
+</div>
+
+<!-- End -->
+<div class="endcard" id="endcard">
+  <div class="endpanel">
+    <h1>SYSTEM CLEARED</h1>
+    <p>You detonated every world from Mercury to Neptune.<br>Only the Sun remains, burning over the debris field.</p>
+    <button class="btn btn-danger" id="btnRestart">REBUILD THE SOLAR SYSTEM</button>
+  </div>
+</div>
+
+<!-- Three.js via ES module import map (no build step needed) -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module" src="./main.js"></script>
+</body>
+</html>

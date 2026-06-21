@@ -7,6 +7,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="style2.css">
+  <link rel="stylesheet" type="text/css" href="gamification.css">
+
+  <script type="importmap">
+  { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }}
+  </script>
 
   <style>
     /* NUCLEAR OVERRIDE: Forces all container layers to become transparent glass */
@@ -172,6 +180,10 @@
       <div class="icon" ondblclick="openWindow('shop')">
         <div class="glyph">🛒</div>
         <div class="label">SHOP</div>
+      </div>
+      <div class="icon" ondblclick="openWindow('achievements')">
+        <div class="glyph">🏆</div>
+        <div class="label">ACHIEVEMENTS</div>
       </div>
       <div class="icon" ondblclick="openWindow('music')">
         <div class="glyph">🎧</div>
@@ -353,9 +365,70 @@
         </div>
       </div>
     </div>
+
+  <!-- Shop Window -->
+  <div class="window" id="win-shop" style="left:calc(50% - 180px); top:80px; display:none;">
+    <div class="titlebar" data-handle>
+      <span class="name">SHOP</span>
+      <div class="winbtns">
+        <button class="winbtn" onclick="minimizeWindow('shop')">—</button>
+        <button class="winbtn" onclick="closeWindow('shop')">×</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="shop-header">
+        <span id="shop-balance">★ 0</span>
+        <div class="shop-tabs">
+          <button class="shop-tab active" data-category="planet" onclick="switchShopCategory('planet')">PLANETS</button>
+          <button class="shop-tab" data-category="cosmetic" onclick="switchShopCategory('cosmetic')">COLORS</button>
+          <button class="shop-tab" data-category="sound" onclick="switchShopCategory('sound')">SOUNDS</button>
+        </div>
+      </div>
+      <div id="shop-grid" class="shop-grid"></div>
+    </div>
   </div>
 
-  </div> <div id="taskbar">
+  <!-- Achievements Window -->
+  <div class="window" id="win-achievements" style="left:calc(50% + 20px); top:80px; display:none;">
+    <div class="titlebar" data-handle>
+      <span class="name">ACHIEVEMENTS</span>
+      <div class="winbtns">
+        <button class="winbtn" onclick="minimizeWindow('achievements')">—</button>
+        <button class="winbtn" onclick="closeWindow('achievements')">×</button>
+      </div>
+    </div>
+    <div class="content">
+      <div class="ach-stats">
+        <div class="ach-stat"><span class="ach-stat-value" id="ach-stat-sessions">0</span><span class="ach-stat-label">Sessions</span></div>
+        <div class="ach-stat"><span class="ach-stat-value" id="ach-stat-time">0m</span><span class="ach-stat-label">Study Time</span></div>
+        <div class="ach-stat"><span class="ach-stat-value" id="ach-stat-streak">0d</span><span class="ach-stat-label">Streak</span></div>
+        <div class="ach-stat"><span class="ach-stat-value" id="ach-stat-longest">0d</span><span class="ach-stat-label">Best</span></div>
+      </div>
+      <div id="planet-progress" class="ach-progress"></div>
+      <div id="ach-list" class="ach-list"></div>
+    </div>
+  </div>
+
+  </div>
+
+  <!-- Space Progress Drawer -->
+  <div id="space-drawer" class="space-drawer">
+    <div class="space-drawer-header">
+      <span class="space-drawer-title">SPACE PROGRESS</span>
+      <div class="space-drawer-controls">
+        <button class="space-drawer-btn" id="btnSpaceOrbit">ORBIT VIEW</button>
+        <button class="space-drawer-btn close" id="btnSpaceClose">&times;</button>
+      </div>
+    </div>
+    <div class="space-drawer-viewport" id="space-viewport">
+      <canvas id="space-scene"></canvas>
+      <div class="space-flash" id="space-flash"></div>
+      <div class="space-planet-label" id="space-planet-label"></div>
+      <div class="space-dots" id="space-dots"></div>
+    </div>
+  </div>
+
+  <div id="taskbar">
     <button id="start-btn-main" onclick="toggleStartMenu()">≡ FOCUS OS</button>
     <div id="start-menu">
       <div class="menu-item" onclick="openWindow('pomodoro'); toggleStartMenu()">⏱ Pomodoro</div>
@@ -364,13 +437,19 @@
       <div class="menu-item" onclick="openWindow('log'); toggleStartMenu()">🗒 Session Log</div>
       <div class="menu-item" onclick="openWindow('help'); toggleStartMenu()">? Help</div>
       <div class="menu-item" onclick="openWindow('shop'); toggleStartMenu()">🛒 Shop</div>
+      <div class="menu-item" onclick="openWindow('achievements'); toggleStartMenu()">🏆 Achievements</div>
       <div class="menu-item" onclick="openWindow('music'); toggleStartMenu()">🎧 Music</div>
     </div>
     <div id="taskbar-items"></div>
+    <span id="hud-points" class="hud-stat">★ 0</span>
+    <span id="hud-streak" class="hud-stat">🔥 0</span>
+    <button id="space-drawer-toggle" class="space-toggle-btn" title="Space Progress">🚀</button>
     <div id="clock">00:00:00</div>
   </div>
 
   <script src="script2.js"></script>
+  <script src="gamification.js"></script>
+  <script type="module" src="space-bridge.js"></script>
 
   <script>
     // ==========================================

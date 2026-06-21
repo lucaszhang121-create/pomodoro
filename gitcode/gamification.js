@@ -3,8 +3,8 @@
 
 const PLAYER_KEY = `focusos_player`;
 const DEFAULT_PLAYER = {
-  points: 0,
-  totalPointsEarned: 0,
+  points: 100,
+  totalPointsEarned: 100,
   totalFocusSessions: 0,
   totalFocusMinutes: 0,
   currentStreak: 0,
@@ -12,7 +12,7 @@ const DEFAULT_PLAYER = {
   lastSessionDate: null,
   achievementsEarned: [],
   ownedItems: [],
-  activePlanet: `mercury`,
+  activePlanet: `earth`,
   activeCosmetic: null,
   activeSound: null
 };
@@ -22,10 +22,21 @@ function loadPlayer(){
     const raw = localStorage.getItem(PLAYER_KEY);
     if (raw) {
       const saved = JSON.parse(raw);
+      // Force reset: clear all old data and start fresh
+      if (saved._migrated !== 2){
+        localStorage.removeItem(PLAYER_KEY);
+        localStorage.removeItem(`focusos_space_progress`);
+        const fresh = Object.assign({}, DEFAULT_PLAYER);
+        fresh._migrated = 2;
+        localStorage.setItem(PLAYER_KEY, JSON.stringify(fresh));
+        return fresh;
+      }
       return Object.assign({}, DEFAULT_PLAYER, saved);
     }
   } catch(e){}
-  return Object.assign({}, DEFAULT_PLAYER);
+  const fresh = Object.assign({}, DEFAULT_PLAYER);
+  fresh._migrated = 2;
+  return fresh;
 }
 
 function savePlayer(player){
@@ -47,13 +58,20 @@ const ACHIEVEMENTS = [
   {id:`streak_30`,    name:`Monthly Master`,    desc:`Maintain a 30-day streak`,           field:`currentStreak`,      threshold:30,  points:500},
 ];
 
+// Planet progression: Earth is free (starting planet), rest are purchased in order.
+// Buying the next planet triggers explosion of current + travel to new one.
+const PLANET_PROGRESSION = [
+  {id:`earth`,   name:`Earth`,   icon:`🌍`, desc:`Home world — your starting point`, price:0},
+  {id:`mars`,    name:`Mars`,    icon:`🔴`, desc:`The red planet`,                   price:100},
+  {id:`venus`,   name:`Venus`,   icon:`🟡`, desc:`The veiled inferno`,               price:200},
+  {id:`mercury`, name:`Mercury`, icon:`⚫`, desc:`Closest to the Sun`,               price:350},
+  {id:`jupiter`, name:`Jupiter`, icon:`🟠`, desc:`King of the planets`,              price:500},
+  {id:`saturn`,  name:`Saturn`,  icon:`💫`, desc:`The ringed jewel`,                 price:750},
+  {id:`uranus`,  name:`Uranus`,  icon:`🔵`, desc:`The tilted ice giant`,             price:900},
+  {id:`neptune`, name:`Neptune`, icon:`🌊`, desc:`The windy blue giant`,             price:1000},
+];
+
 const SHOP_ITEMS = [
-  {id:`venus_theme`,   name:`Venus Atmosphere`, desc:`Amber haze nebula backdrop`,     category:`planet`,   price:100,  themeColors:{c1:`#1a1508`,c2:`#0d0a04`,c3:`#050301`}},
-  {id:`earth_theme`,   name:`Earth Rise`,       desc:`Blue marble orbital view`,       category:`planet`,   price:200,  themeColors:{c1:`#081a16`,c2:`#040d0a`,c3:`#010503`}},
-  {id:`mars_theme`,    name:`Mars Dust`,        desc:`Red canyon landscape`,           category:`planet`,   price:350,  themeColors:{c1:`#1a0808`,c2:`#0d0404`,c3:`#050101`}},
-  {id:`jupiter_theme`, name:`Jupiter Storm`,    desc:`Great Red Spot swirl`,           category:`planet`,   price:500,  themeColors:{c1:`#1a1208`,c2:`#0d0904`,c3:`#050401`}},
-  {id:`saturn_theme`,  name:`Saturn Rings`,     desc:`Golden ring system`,             category:`planet`,   price:750,  themeColors:{c1:`#1a1a08`,c2:`#0d0d04`,c3:`#050501`}},
-  {id:`neptune_theme`, name:`Neptune Deep`,     desc:`Deep blue ice giant`,            category:`planet`,   price:1000, themeColors:{c1:`#08081a`,c2:`#04040d`,c3:`#010105`}},
   {id:`neon_green`,    name:`Neon Matrix`,      desc:`Green neon timer glow`,          category:`cosmetic`, price:75,   color:`#39FF14`},
   {id:`cyber_pink`,    name:`Cyber Pink`,       desc:`Hot pink timer ring`,            category:`cosmetic`, price:75,   color:`#FF1493`},
   {id:`ice_blue`,      name:`Ice Blue`,         desc:`Frozen blue timer`,              category:`cosmetic`, price:75,   color:`#00CED1`},
@@ -61,16 +79,16 @@ const SHOP_ITEMS = [
   {id:`space_chime`,   name:`Space Chime`,      desc:`Ethereal space chime`,           category:`sound`,    price:50,   frequency:880},
 ];
 
-const PLANET_STAGES = [
-  {id:`mercury`,  name:`Mercury`,  threshold:0},
-  {id:`venus`,    name:`Venus`,    threshold:100},
-  {id:`earth`,    name:`Earth`,    threshold:300},
-  {id:`mars`,     name:`Mars`,     threshold:600},
-  {id:`jupiter`,  name:`Jupiter`,  threshold:1000},
-  {id:`saturn`,   name:`Saturn`,   threshold:1500},
-  {id:`neptune`,  name:`Neptune`,  threshold:2500},
-  {id:`pluto`,    name:`Pluto`,    threshold:4000},
-];
+const PLANET_STAGES = PLANET_PROGRESSION;
+
+function getCurrentPlanetStep(player){
+  for (let i = PLANET_PROGRESSION.length - 1; i >= 0; i--){
+    if (i === 0 || player.ownedItems.indexOf(PLANET_PROGRESSION[i].id) !== -1){
+      return i;
+    }
+  }
+  return 0;
+}
 
 // ===== CORE LOGIC =====
 
@@ -114,9 +132,10 @@ function checkAchievements(player){
 }
 
 function getUnlockedPlanets(player){
-  const unlocked = [];
-  for (let i = 0; i < PLANET_STAGES.length; i++){
-    if (player.totalPointsEarned >= PLANET_STAGES[i].threshold) unlocked.push(PLANET_STAGES[i].id);
+  const unlocked = [`earth`];
+  for (let i = 1; i < PLANET_PROGRESSION.length; i++){
+    if (player.ownedItems.indexOf(PLANET_PROGRESSION[i].id) !== -1) unlocked.push(PLANET_PROGRESSION[i].id);
+    else break;
   }
   return unlocked;
 }
@@ -131,16 +150,10 @@ function awardSession(sessionType, durationMinutes){
   }
   updateStreak(player);
   const newAchievements = checkAchievements(player);
-  const unlockedBefore = getUnlockedPlanets(player).length;
   savePlayer(player);
-  const unlockedAfter = getUnlockedPlanets(player);
 
   for (let i = 0; i < newAchievements.length; i++){
     showToast(`🏆 ${newAchievements[i].name} — +${newAchievements[i].points} pts`);
-  }
-  if (unlockedAfter.length > unlockedBefore){
-    const newest = PLANET_STAGES[unlockedAfter.length - 1];
-    showToast(`🪐 Planet unlocked: ${newest.name}!`);
   }
   if (sessionType === `focus`){
     showToast(`+10 pts`);
@@ -151,6 +164,29 @@ function awardSession(sessionType, durationMinutes){
 }
 
 // ===== SHOP =====
+
+function purchasePlanet(planetId){
+  const player = loadPlayer();
+  const currentStep = getCurrentPlanetStep(player);
+  const nextStep = currentStep + 1;
+  if (nextStep >= PLANET_PROGRESSION.length) return;
+  const planet = PLANET_PROGRESSION[nextStep];
+  if (planet.id !== planetId) return;
+  if (player.points < planet.price){
+    showToast(`Not enough points!`);
+    return;
+  }
+  player.points -= planet.price;
+  player.ownedItems.push(planet.id);
+  player.activePlanet = planet.id;
+  savePlayer(player);
+  showToast(`Traveling to ${planet.name}!`);
+  updatePlayerHUD();
+  renderShop();
+  window.dispatchEvent(new CustomEvent(`focusos:planet-purchased`, {
+    detail: { planetId: planet.id, step: nextStep }
+  }));
+}
 
 function purchaseItem(itemId){
   const player = loadPlayer();
@@ -163,10 +199,7 @@ function purchaseItem(itemId){
   }
   player.points -= item.price;
   player.ownedItems.push(itemId);
-  if (item.category === `planet`) {
-    player.activePlanet = itemId;
-    window.activeTheme = itemId;
-  } else if (item.category === `cosmetic`) {
+  if (item.category === `cosmetic`) {
     player.activeCosmetic = itemId;
     applyCosmetic(item.color);
   } else if (item.category === `sound`) {
@@ -182,10 +215,7 @@ function equipItem(itemId){
   const player = loadPlayer();
   const item = SHOP_ITEMS.find(function(i){ return i.id === itemId; });
   if (!item || player.ownedItems.indexOf(itemId) === -1) return;
-  if (item.category === `planet`){
-    player.activePlanet = itemId;
-    window.activeTheme = itemId;
-  } else if (item.category === `cosmetic`){
+  if (item.category === `cosmetic`){
     if (player.activeCosmetic === itemId){
       player.activeCosmetic = null;
       applyCosmetic(null);
@@ -213,13 +243,7 @@ function applyCosmetic(color){
 }
 
 function activatePlanetStage(planetId){
-  const player = loadPlayer();
-  const unlocked = getUnlockedPlanets(player);
-  if (unlocked.indexOf(planetId) === -1) return;
-  player.activePlanet = planetId;
-  window.activeTheme = planetId;
-  savePlayer(player);
-  renderAchievements();
+  // Planet activation is now handled by shop purchases
 }
 
 // ===== UI =====
@@ -262,21 +286,57 @@ function renderShop(){
   if (!grid) return;
   grid.innerHTML = ``;
 
+  if (shopCategory === `planet`){
+    const currentStep = getCurrentPlanetStep(player);
+    for (let i = 0; i < PLANET_PROGRESSION.length; i++){
+      const p = PLANET_PROGRESSION[i];
+      const isCurrent = (i === currentStep);
+      const isVisited = (i < currentStep);
+      const isNext = (i === currentStep + 1);
+      const isLocked = (i > currentStep + 1);
+      const canAfford = player.points >= p.price;
+
+      const card = document.createElement(`div`);
+      card.className = `shop-item`;
+      if (isCurrent) card.classList.add(`planet-current`);
+      else if (isVisited) card.classList.add(`planet-visited`);
+      else if (isLocked) card.classList.add(`planet-locked`);
+
+      const preview = `<div class="shop-preview shop-planet-preview"><span class="shop-planet-icon">${p.icon}</span></div>`;
+
+      let btnHtml;
+      if (isCurrent){
+        btnHtml = `<div class="shop-planet-status current-badge">CURRENT</div>`;
+      } else if (isVisited){
+        btnHtml = `<div class="shop-planet-status visited-badge">VISITED</div>`;
+      } else if (isNext){
+        if (canAfford){
+          btnHtml = `<button class="btn shop-buy" onclick="purchasePlanet('${p.id}')">★ ${p.price} — TRAVEL</button>`;
+        } else {
+          btnHtml = `<button class="btn shop-buy" disabled>★ ${p.price}</button>`;
+        }
+      } else {
+        btnHtml = `<div class="shop-planet-status locked-badge">🔒 ★ ${p.price}</div>`;
+      }
+
+      card.innerHTML = `${preview}<div class="shop-item-info"><div class="shop-item-name">${p.name}</div><div class="shop-item-desc">${p.desc}</div></div>${btnHtml}`;
+      grid.appendChild(card);
+    }
+    return;
+  }
+
   const filtered = SHOP_ITEMS.filter(function(item){ return item.category === shopCategory; });
   for (let i = 0; i < filtered.length; i++){
     const item = filtered[i];
     const owned = player.ownedItems.indexOf(item.id) !== -1;
-    const isActive = (item.category === `planet` && player.activePlanet === item.id) ||
-                     (item.category === `cosmetic` && player.activeCosmetic === item.id) ||
+    const isActive = (item.category === `cosmetic` && player.activeCosmetic === item.id) ||
                      (item.category === `sound` && player.activeSound === item.id);
 
     const card = document.createElement(`div`);
     card.className = `shop-item` + (owned ? ` owned` : ``);
 
     let preview = ``;
-    if (item.category === `planet` && item.themeColors){
-      preview = `<div class="shop-preview" style="background:${item.themeColors.c1};"></div>`;
-    } else if (item.category === `cosmetic` && item.color){
+    if (item.category === `cosmetic` && item.color){
       preview = `<div class="shop-preview" style="background:${item.color};"></div>`;
     } else if (item.category === `sound`){
       preview = `<div class="shop-preview sound-preview">♪</div>`;
@@ -327,7 +387,7 @@ function renderAchievements(){
       const isCurrent = player.activePlanet === p.id;
       const dot = document.createElement(`div`);
       dot.className = `ach-planet-dot` + (isUnlocked ? ` unlocked` : ``) + (isCurrent ? ` current` : ``);
-      dot.title = p.name + ` (` + p.threshold + ` pts)`;
+      dot.title = p.name + (p.price > 0 ? ` (★ ` + p.price + `)` : ` (Starting)`);
       dot.innerHTML = `<span class="planet-icon">${isUnlocked ? `●` : `○`}</span><span class="planet-label">${p.name}</span>`;
       if (isUnlocked) dot.onclick = (function(pid){ return function(){ activatePlanetStage(pid); }; })(p.id);
       progressBar.appendChild(dot);
@@ -403,9 +463,15 @@ beep = function(){
 
 // ===== INIT =====
 
+window.resetAllProgress = function(){
+  localStorage.removeItem(PLAYER_KEY);
+  localStorage.removeItem(`focusos_space_progress`);
+  location.reload();
+};
+
 (function initGamification(){
   const player = loadPlayer();
-  window.activeTheme = player.activePlanet || `mercury`;
+  window.activeTheme = player.activePlanet || `earth`;
   if (player.activeCosmetic){
     const cosmItem = SHOP_ITEMS.find(function(i){ return i.id === player.activeCosmetic; });
     if (cosmItem) applyCosmetic(cosmItem.color);

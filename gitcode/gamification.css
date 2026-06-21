@@ -128,6 +128,63 @@
     border: 1px solid var(--track);
 }
 
+.shop-planet-preview {
+    width: 42px;
+    height: 42px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 0 12px rgba(0,0,0,0.5);
+}
+
+.shop-planet-icon {
+    font-size: 20px;
+    filter: drop-shadow(0 0 4px rgba(255,255,255,0.3));
+}
+
+.shop-item.planet-current {
+    border-color: var(--focus);
+    background: rgba(255, 159, 28, 0.06);
+}
+
+.shop-item.planet-visited {
+    opacity: 0.45;
+}
+
+.shop-item.planet-locked {
+    opacity: 0.35;
+}
+
+.shop-planet-status {
+    flex-shrink: 0;
+    padding: 4px 10px;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    font-family: inherit;
+}
+
+.current-badge {
+    color: var(--focus);
+    border: 1px solid var(--focus);
+}
+
+.visited-badge {
+    color: var(--muted);
+    border: 1px solid var(--track);
+}
+
+.locked-badge {
+    color: var(--muted);
+    border: 1px solid var(--track);
+}
+
+.shop-buy:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 .shop-preview.sound-preview {
     display: flex;
     align-items: center;
