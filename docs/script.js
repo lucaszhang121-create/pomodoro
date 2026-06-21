@@ -284,8 +284,10 @@ function renderLog(){
 
 const songs = [ 
   {song: "Falling Behind", artist: "Luffy", elem: document.getElementById(`falling-behind`)},
+  {song: "Garden", artist: "Fujii Kaze", elem: document.getElementById(`garden`)},
+  {song: "Cornfield Chase", artist: "Hans Zimmer", elem: document.getElementById(`interstellar`)},
   {song: "From the Start", artist: "Luffy", elem: document.getElementById(`from-the-start`)},
-  {song: "Interstellar", artist: "Hans Zimmer", elem: document.getElementById(`interstellar`)},
+  {song: "Ditto", artist: "NewJeans", elem: document.getElementById(`ditto`)},
 ]
 let currentIndex = 0;
 function playSong(id, toggle){

@@ -8,4 +8,4 @@ dependencies = [
 ]
 
 [tool.vercel]
-entrypoint = "gitcode.server:app"
+entrypoint = "docs.server:app"
