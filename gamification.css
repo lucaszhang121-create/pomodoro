@@ -1,0 +1,338 @@
+/* ===== FOCUSOS GAMIFICATION STYLES ===== */
+
+/* ---------- Player HUD ---------- */
+#player-hud {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+#hud-points {
+    font-size: 11px;
+    color: var(--focus);
+    letter-spacing: 0.04em;
+}
+
+#hud-streak {
+    font-size: 11px;
+    color: var(--long);
+    letter-spacing: 0.04em;
+}
+
+/* ---------- Toast ---------- */
+.toast-container {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    pointer-events: none;
+}
+
+.toast {
+    padding: 8px 14px;
+    background: var(--panel);
+    border: 1px solid var(--focus);
+    color: var(--text);
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.45);
+    animation: toast-in 0.3s ease, toast-out 0.4s ease 2.5s forwards;
+    pointer-events: auto;
+}
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toast-out {
+    from { opacity: 1; }
+    to   { opacity: 0; transform: translateY(-10px); }
+}
+
+/* ---------- Shop ---------- */
+.shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 8px 10px;
+    background: var(--bg);
+    border: 1px solid var(--track);
+}
+
+.shop-balance-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+}
+
+.shop-balance {
+    font-size: 14px;
+    font-family: 'VT323', monospace;
+    color: var(--focus);
+}
+
+.shop-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.shop-tab {
+    flex: 1;
+    padding: 5px 0;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    background: var(--bg);
+    border: 1px solid var(--track);
+    color: var(--muted);
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.shop-tab.active {
+    background: var(--focus);
+    color: #0D1117;
+    border-color: var(--focus);
+}
+
+.shop-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.shop-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px;
+    background: var(--bg);
+    border: 1px solid var(--track);
+}
+
+.shop-item.owned {
+    border-color: var(--long);
+}
+
+.shop-preview {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border: 1px solid var(--track);
+}
+
+.shop-preview.sound-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: var(--muted);
+    background: var(--panel) !important;
+}
+
+.shop-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.shop-item-name {
+    font-size: 11px;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+
+.shop-item-desc {
+    font-size: 9px;
+    color: var(--muted);
+}
+
+.shop-buy {
+    flex-shrink: 0;
+    padding: 5px 10px !important;
+    font-size: 10px !important;
+    background: var(--focus) !important;
+    color: #0D1117 !important;
+    border-color: var(--focus) !important;
+    font-weight: 600;
+}
+
+.shop-equip {
+    flex-shrink: 0;
+    padding: 5px 10px !important;
+    font-size: 10px !important;
+}
+
+.shop-equipped {
+    flex-shrink: 0;
+    padding: 5px 10px !important;
+    font-size: 10px !important;
+    background: var(--long) !important;
+    color: #0D1117 !important;
+    border-color: var(--long) !important;
+}
+
+/* ---------- Achievements ---------- */
+.ach-stats {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.ach-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px;
+    background: var(--bg);
+    border: 1px solid var(--track);
+}
+
+.ach-stat-label {
+    font-size: 8px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 4px;
+}
+
+.ach-stat-value {
+    font-size: 16px;
+    font-family: 'VT323', monospace;
+    color: var(--text);
+}
+
+.ach-section-label {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+}
+
+.ach-progress {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 14px;
+    padding: 8px 4px;
+    background: var(--bg);
+    border: 1px solid var(--track);
+    overflow-x: auto;
+}
+
+.ach-planet-dot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 2px;
+    cursor: default;
+    opacity: 0.35;
+}
+
+.ach-planet-dot.unlocked {
+    opacity: 1;
+    cursor: pointer;
+}
+
+.ach-planet-dot.current .planet-icon {
+    color: var(--focus);
+    text-shadow: 0 0 6px var(--focus);
+}
+
+.planet-icon {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.planet-label {
+    font-size: 7px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+}
+
+.ach-progress-line {
+    flex: 1;
+    height: 1px;
+    min-width: 8px;
+    background: var(--track);
+    margin: 0 2px;
+    margin-bottom: 12px;
+}
+
+.ach-progress-line.filled {
+    background: var(--focus);
+}
+
+.ach-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.ach-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: var(--bg);
+    border: 1px solid var(--track);
+}
+
+.ach-row.locked {
+    opacity: 0.4;
+}
+
+.ach-row.earned {
+    border-color: var(--focus);
+}
+
+.ach-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+}
+
+.ach-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.ach-name {
+    font-size: 11px;
+    color: var(--text);
+}
+
+.ach-desc {
+    font-size: 9px;
+    color: var(--muted);
+    margin-bottom: 3px;
+}
+
+.ach-bar-wrap {
+    height: 3px;
+    background: var(--track);
+    width: 100%;
+}
+
+.ach-bar-fill {
+    height: 100%;
+    background: var(--focus);
+    transition: width 0.3s ease;
+}
+
+.ach-points {
+    font-size: 9px;
+    color: var(--muted);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
