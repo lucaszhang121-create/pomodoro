@@ -29,7 +29,7 @@ After using the Pomodoro timer, the Session Log app will have a record of when e
 
 <h3>Nova AI:</h3>
 Nova AI is a trained assistant that is specifically designed for studying and helping students understand concepts. It uses the OpenAI API to accomplish this purpose.<br>
-<img width="465" height="61<img width="465" height="538" alt="Screenshot 2026-06-21 at 1 58 51 PM" src="https://github.com/user-attachments/assets/60c31eaf-3397-400d-8be6-f935d81800ad" />
+<img width="465" height="538" <img width="465" height="538" alt="Screenshot 2026-06-21 at 1 58 51 PM" src="https://github.com/user-attachments/assets/60c31eaf-3397-400d-8be6-f935d81800ad" />
 
 <h3>Flashcards:</h3>
 Flashcards function using CohereAI and after getting prompted by the user for a subject, creates flashcards in the JSON format which are later turned into flashcards.
