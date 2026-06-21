@@ -135,6 +135,11 @@ function loadTextures() {
       ufoTexNormal = tl.load('WIthoutLaser.png');
       ufoTexLaser = tl.load('WithLaser.png');
       ufoGlowTex = makeGlowTex();
+      if (pendingAdvance !== null) {
+        const step = pendingAdvance;
+        pendingAdvance = null;
+        advanceTo(step);
+      }
     });
 }
 
@@ -523,9 +528,14 @@ function removeBeam(a) {
 }
 
 
+let pendingAdvance = null;
+
 function advanceTo(step) {
   if (!initialized) init();
-  if (planets.length === 0) return;
+  if (planets.length === 0) {
+    pendingAdvance = step;
+    return;
+  }
   detonateAndTravel(step);
 }
 

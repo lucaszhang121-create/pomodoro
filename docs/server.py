@@ -1,9 +1,15 @@
 import os
 import json
+import sys
 from flask import Flask, request, jsonify, send_from_directory
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+SPACEPROGRESS_DIR = os.path.abspath(os.path.join(BASE_DIR, '..', 'spaceprogress'))
+
+sys.path.insert(0, BASE_DIR)
 from AITool import AITool
 
-app = Flask(__name__, static_folder='.', static_url_path='')
+app = Flask(__name__, static_folder=BASE_DIR, static_url_path='')
 
 api_key = os.environ.get('OPENAI_API_KEY', '')
 ai = None
@@ -18,9 +24,7 @@ def get_ai():
 
 @app.route('/')
 def index():
-    return send_from_directory('.', 'index.html')
-
-SPACEPROGRESS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'spaceprogress'))
+    return send_from_directory(BASE_DIR, 'index2.html')
 
 @app.route('/spaceprogress/<path:filename>')
 def spaceprogress_files(filename):
@@ -28,13 +32,13 @@ def spaceprogress_files(filename):
 
 @app.route('/<path:path>')
 def static_files(path):
-    return send_from_directory('.', path)
+    return send_from_directory(BASE_DIR, path)
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
     tool = get_ai()
     if not tool:
-        return jsonify({'error': 'OPENAI_API_KEY not set. Run: export OPENAI_API_KEY=your-key'}), 500
+        return jsonify({'error': 'OPENAI_API_KEY not set.'}), 500
     data = request.get_json()
     message = data.get('message', '').strip()
     if not message:
@@ -64,7 +68,7 @@ def chat_history():
 def generate_flashcards():
     tool = get_ai()
     if not tool:
-        return jsonify({'error': 'OPENAI_API_KEY not set. Run: export OPENAI_API_KEY=your-key'}), 500
+        return jsonify({'error': 'OPENAI_API_KEY not set.'}), 500
     data = request.get_json()
     text = data.get('text', '').strip()
     if not text:
