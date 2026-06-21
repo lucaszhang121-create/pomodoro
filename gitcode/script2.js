@@ -2,10 +2,10 @@
 const windows = {
     pomodoro: { elem: document.getElementById(`win-pomodoro`), title: `⏱ Pomodoro` },
     log: { elem: document.getElementById(`win-log`),      title: `🗒 Session Log` },
-    help: {elem: document.getElementById(`win-help`), title: `? Help`},
-    music: {elem: document.getElementById(`win-music`), title: `🎧 Music`},
     nova: {elem: document.getElementById(`win-nova`), title: `💬 Nova`},
-    flashcards: {elem: document.getElementById(`win-flashcards`), title: `📇 Flashcards`}
+    flashcards: {elem: document.getElementById(`win-flashcards`), title: `📇 Flashcards`},
+    music: {elem: document.getElementById(`win-music`), title: `🎧 Music`},
+    help: {elem: document.getElementById(`win-help`), title: `? Help`},
 };
 let zCounter = 10;
 
@@ -270,7 +270,7 @@ function renderLog(){
     row.className = `log-row`;
     const time = entry.time.toLocaleTimeString([], {hour:`2-digit`, minute:`2-digit`});
     const cls = entry.type.includes(`Focus`) ? `lt-focus` : `lt-break`;
-    row.innerHTML = `<span class="log-type ${cls}">${entry.type}</span><span class="log-time">${time}</span><div style="display: flex; flex-direction: row; gap: 0.5rem;"><button style="background-color: green; width: 1rem; height: 1rem;"></button><button style="background-color: red; width: 1rem; height: 1rem;"></button></div>`;
+    row.innerHTML = `<span class="log-type ${cls}">${entry.type}</span><span class="log-time">${time}</span>`;
     list.appendChild(row);
   }
 }
