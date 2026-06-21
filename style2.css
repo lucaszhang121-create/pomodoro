@@ -497,3 +497,51 @@ body {
 li {
     margin: 0rem;
 }
+
+#music-panel {
+    display: flex; 
+    flex-direction: row;
+    gap: 2.25rem;
+}
+
+#vinyl-player {
+    display: flex;
+    flex-direction: row;
+    background-color: grey;
+    height: 100%;
+    width: 50%;
+    padding: 0.25rem;
+}
+
+#vinyl {
+    animation: spin 5s linear infinite;
+    animation-play-state: paused;
+    transition: transform 0.5s ease;
+    width: 100%;
+    filter: drop-shadow(5px 3px 5px rgba(0,0,0,0.25));
+}
+
+#player {
+    flex-direction: column; 
+    justify-items: center;
+    margin-top: 1.5rem;
+}
+
+#song-name {
+}
+
+#artist-name {
+}
+
+.music-controls {
+    background: transparent;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
