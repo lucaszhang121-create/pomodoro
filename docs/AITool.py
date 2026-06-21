@@ -1,5 +1,8 @@
 from openai import OpenAI
-from history import load_history, save_history, clear_history
+try:
+    from gitcode.history import load_history, save_history, clear_history
+except ImportError:
+    from history import load_history, save_history, clear_history
 
 SYSTEM_PROMPT = '''You are Nova, a friendly and encouraging AI study assistant designed for K-12 students. Your goal is to help students truly understand what they're learning — not just get the right answer.
 

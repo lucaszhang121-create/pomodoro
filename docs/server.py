@@ -11,7 +11,7 @@ from AITool import AITool
 
 app = Flask(__name__, static_folder=BASE_DIR, static_url_path='')
 
-api_key = os.environ.get('OPENAI_API_KEY', '')
+api_key = os.environ.get('openai_api', '')
 ai = None
 
 def get_ai():
@@ -38,7 +38,7 @@ def static_files(path):
 def chat():
     tool = get_ai()
     if not tool:
-        return jsonify({'error': 'OPENAI_API_KEY not set.'}), 500
+        return jsonify({'error': 'openai_api not set.'}), 500
     data = request.get_json()
     message = data.get('message', '').strip()
     if not message:
@@ -68,7 +68,7 @@ def chat_history():
 def generate_flashcards():
     tool = get_ai()
     if not tool:
-        return jsonify({'error': 'OPENAI_API_KEY not set.'}), 500
+        return jsonify({'error': 'openai_api not set.'}), 500
     data = request.get_json()
     text = data.get('text', '').strip()
     if not text:
@@ -96,7 +96,7 @@ Study material:
 
 if __name__ == '__main__':
     if not api_key:
-        print('WARNING: OPENAI_API_KEY not set. Nova and Flashcards will not work.')
-        print('Run: export OPENAI_API_KEY=your-key-here')
+        print('WARNING: openai_api not set. Nova and Flashcards will not work.')
+        print('Run: export openai_api=your-key-here')
     print('Starting FocusOS server at http://localhost:8000')
     app.run(host='0.0.0.0', port=8000, debug=True)
